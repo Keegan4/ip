@@ -17,16 +17,36 @@ public class Panda {
 
         System.out.println(divider);
         System.out.println(banner);
+
+        // Introduction
         System.out.println("Hello! I'm Panda.");
         System.out.println("What can I do for you?");
+
+        // Main message loop
         Scanner scanner = new Scanner(System.in);
+        String[] messages = new String[100];
+        int messageCount = 0;
         String msg = scanner.nextLine();
         while (!msg.equals("bye")) {
+            System.out.println(divider);
+            if (msg.equals("list")) {
+                // The case for list
+                for (int i = 0; i < messageCount; i++) {
+                    System.out.printf("%d. %s%n", i + 1, messages[i]);
+                }
+            }
+            else {
+                // General Echo case
 
-            System.out.println(msg);
+                System.out.println(msg);
+                messages[messageCount] = msg;
+                messageCount++;
+
+            }
             System.out.println(divider);
             msg = scanner.nextLine();
         }
+        System.out.println(divider);
         System.out.println("Bye. Hope to see you again soon!");
         System.out.println(divider);
     }
