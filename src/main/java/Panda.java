@@ -1,3 +1,4 @@
+import java.util.Scanner;
 public class Panda {
     /**
      * Starts the Panda chatbot and displays its greeting and closing messages.
@@ -18,7 +19,14 @@ public class Panda {
         System.out.println(banner);
         System.out.println("Hello! I'm Panda.");
         System.out.println("What can I do for you?");
-        System.out.println(divider);
+        Scanner scanner = new Scanner(System.in);
+        String msg = scanner.nextLine();
+        while (!msg.equals("bye")) {
+
+            System.out.println(msg);
+            System.out.println(divider);
+            msg = scanner.nextLine();
+        }
         System.out.println("Bye. Hope to see you again soon!");
         System.out.println(divider);
     }
