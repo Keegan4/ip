@@ -25,21 +25,41 @@ public class Panda {
         // Main message loop
         Scanner scanner = new Scanner(System.in);
         String[] messages = new String[100];
+        // Written by Codex: Keep completion state alongside each stored task.
+        boolean[] done = new boolean[100];
         int messageCount = 0;
         String msg = scanner.nextLine();
         while (!msg.equals("bye")) {
             System.out.println(divider);
             if (msg.equals("list")) {
-                // The case for list
+                // Written by Codex: Show every task with its current completion marker.
+                System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < messageCount; i++) {
-                    System.out.printf("%d. %s%n", i + 1, messages[i]);
+                    String status = done[i] ? "X" : " ";
+                    System.out.printf("%d.[%s] %s%n", i + 1, status, messages[i]);
+                }
+            }
+            else if (msg.startsWith("mark ")) {
+                // Written by Codex: Parse a mark command and update the selected task in-place.
+                String taskNumberText = msg.substring("mark ".length()).trim();
+                try {
+                    int taskNumber = Integer.parseInt(taskNumberText);
+                    if (taskNumber >= 1 && taskNumber <= messageCount) {
+                        done[taskNumber - 1] = true;
+                        System.out.println("Nice! I've marked this task as done:");
+                        System.out.printf("  [X] %s%n", messages[taskNumber - 1]);
+                    } else {
+                        System.out.println("I couldn't find that task.");
+                    }
+                } catch (NumberFormatException exception) {
+                    System.out.println("Please provide a valid task number.");
                 }
             }
             else {
-                // General Echo case
-
+                // Written by Codex: Add ordinary user input as a new, initially unfinished task.
                 System.out.println(msg);
                 messages[messageCount] = msg;
+                done[messageCount] = false;
                 messageCount++;
 
             }
