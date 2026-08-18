@@ -2,7 +2,7 @@
 
 ## Configuration
 
-- Setup command: `javac -d build/classes src/main/java/PandaException.java src/main/java/EmptyDescriptionException.java src/main/java/InvalidCommandException.java src/main/java/InvalidTaskNumberException.java src/main/java/MissingDateTimeException.java src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Panda.java`
+- Setup command: `javac -d build/classes src/main/java/PandaException.java src/main/java/EmptyDescriptionException.java src/main/java/InvalidCommandException.java src/main/java/InvalidTaskNumberException.java src/main/java/MissingDateTimeException.java src/main/java/Command.java src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Panda.java`
 - Run command: `java -cp build/classes Panda`
 - Timeout seconds: `10`
 
@@ -270,14 +270,16 @@ Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-## Test Case: Reject an unknown command
+## Test Case: Reject unsupported command messages
 
-Aim: Verify that an unrecognized command reports a panda-themed error and does not add a task.
+Aim: Verify that the Command enum rejects unknown keywords and arguments supplied to argument-free commands.
 
 Input:
 
 ```text
 blah
+list extra
+bye extra
 bye
 ```
 
@@ -293,6 +295,12 @@ ____________________________________________________________
 
 Hello! I'm Panda.
 What can I do for you?
+____________________________________________________________
+OOPS!!! I'm bamboo-zled; I don't know what that means :-(
+____________________________________________________________
+____________________________________________________________
+OOPS!!! I'm bamboo-zled; I don't know what that means :-(
+____________________________________________________________
 ____________________________________________________________
 OOPS!!! I'm bamboo-zled; I don't know what that means :-(
 ____________________________________________________________

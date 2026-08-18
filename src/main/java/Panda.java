@@ -36,12 +36,15 @@ public class Panda {
         // Written by Codex: Treat a closed input stream as a graceful end to the session.
         while (scanner.hasNextLine()) {
             String msg = scanner.nextLine();
-            if (msg.equals("bye")) {
+            if (Command.BYE.matches(msg)) {
                 break;
             }
             System.out.println(divider);
             try {
-                if (msg.equals("list")) {
+                // Written by Codex: Convert the message into a fixed command before dispatching it.
+                Command command = Command.fromMessage(msg);
+                switch (command) {
+                case LIST -> {
                     // Written by Codex: Show every task with its current completion marker.
                     System.out.println("Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
@@ -50,36 +53,40 @@ public class Panda {
                         System.out.printf("%d.[%s][%s] %s%n", i + 1, task.getTypeMarker(), status,
                                 task.getDisplayText());
                     }
-                } else if (msg.equals("mark") || msg.startsWith("mark ")) {
+                }
+                case MARK -> {
                     // Written by Codex: Convert invalid mark arguments into a PandaException.
-                    int taskNumber = parseTaskNumber(msg, "mark", tasks.size());
+                    int taskNumber = parseTaskNumber(msg, command, tasks.size());
                     Task task = tasks.get(taskNumber - 1);
                     task.mark();
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.printf("  [X] %s%n", task.getName());
-                } else if (msg.equals("unmark") || msg.startsWith("unmark ")) {
+                }
+                case UNMARK -> {
                     // Written by Codex: Convert invalid unmark arguments into a PandaException.
-                    int taskNumber = parseTaskNumber(msg, "unmark", tasks.size());
+                    int taskNumber = parseTaskNumber(msg, command, tasks.size());
                     Task task = tasks.get(taskNumber - 1);
                     task.unmark();
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.printf("  [ ] %s%n", task.getName());
-                } else if (msg.equals("delete") || msg.startsWith("delete ")) {
+                }
+                case DELETE -> {
                     // Written by Codex: Let ArrayList remove the task and close the index gap.
-                    int taskNumber = parseTaskNumber(msg, "delete", tasks.size());
+                    int taskNumber = parseTaskNumber(msg, command, tasks.size());
                     Task removedTask = tasks.remove(taskNumber - 1);
                     String status = removedTask.isDone() ? "X" : " ";
                     System.out.println("Noted. I've removed this task:");
                     System.out.printf("  [%s][%s] %s%n", removedTask.getTypeMarker(), status,
                             removedTask.getDisplayText());
                     System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
-                } else if (msg.equals("event") || msg.startsWith("event ")) {
+                }
+                case EVENT -> {
                     // Written by Codex: Split event input without validating either date/time value.
-                    String eventDetails = msg.substring("event".length()).trim();
-                    ensureDescription(eventDetails, "event");
+                    String eventDetails = msg.substring(command.getKeyword().length()).trim();
+                    ensureDescription(eventDetails, command);
                     // Written by Codex: Treat a leading time marker as a missing event description.
                     if (eventDetails.startsWith("/from ") || eventDetails.startsWith("from ")) {
-                        throw new EmptyDescriptionException("event");
+                        throw new EmptyDescriptionException(command.getKeyword());
                     }
                     String fromSeparator = eventDetails.contains(" /from ") ? " /from " : " from ";
                     String toSeparator = eventDetails.contains(" /to ") ? " /to " : " to ";
@@ -100,13 +107,14 @@ public class Panda {
                         System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getDisplayText());
                         System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
                     }
-                } else if (msg.equals("deadline") || msg.startsWith("deadline ")) {
+                }
+                case DEADLINE -> {
                     // Written by Codex: Split deadline input without validating the date/time text.
-                    String deadlineDetails = msg.substring("deadline".length()).trim();
-                    ensureDescription(deadlineDetails, "deadline");
+                    String deadlineDetails = msg.substring(command.getKeyword().length()).trim();
+                    ensureDescription(deadlineDetails, command);
                     // Written by Codex: Treat a leading time marker as a missing deadline description.
                     if (deadlineDetails.startsWith("/by ") || deadlineDetails.startsWith("by ")) {
-                        throw new EmptyDescriptionException("deadline");
+                        throw new EmptyDescriptionException(command.getKeyword());
                     }
                     String separator = deadlineDetails.contains(" /by ") ? " /by " : " by ";
                     int separatorIndex = deadlineDetails.indexOf(separator);
@@ -122,18 +130,18 @@ public class Panda {
                         System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getDisplayText());
                         System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
                     }
-                } else if (msg.equals("todo") || msg.startsWith("todo ")) {
+                }
+                case TODO -> {
                     // Written by Codex: Reject a Todo that has no description to store.
-                    String taskName = msg.substring("todo".length()).trim();
-                    ensureDescription(taskName, "todo");
+                    String taskName = msg.substring(command.getKeyword().length()).trim();
+                    ensureDescription(taskName, command);
                     Task task = new Todo(taskName);
                     tasks.add(task);
                     System.out.println("Got it. I've added this task:");
                     System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getName());
                     System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
-                } else {
-                    // Written by Codex: Represent unknown input with a dedicated exception.
-                    throw new InvalidCommandException();
+                }
+                case BYE -> throw new IllegalStateException("The bye command should exit before dispatch.");
                 }
             } catch (PandaException exception) {
                 // Written by Codex: Show expected input errors and continue accepting commands.
@@ -152,19 +160,19 @@ public class Panda {
      * Written by Codex: Translate Java number-format failures into a domain-specific error.
      *
      * @param message the complete user command
-     * @param command the command name
+     * @param command the command being processed
      * @param taskListSize the number of tasks currently stored
      * @return the valid one-based task number
      * @throws InvalidTaskNumberException if the argument is missing, non-numeric, or out of range
      */
-    private static int parseTaskNumber(String message, String command, int taskListSize)
+    private static int parseTaskNumber(String message, Command command, int taskListSize)
             throws InvalidTaskNumberException {
-        String taskNumberText = message.substring(command.length()).trim();
+        String taskNumberText = message.substring(command.getKeyword().length()).trim();
         int taskNumber;
         try {
             taskNumber = Integer.parseInt(taskNumberText);
         } catch (NumberFormatException exception) {
-            throw new InvalidTaskNumberException(command);
+            throw new InvalidTaskNumberException(command.getKeyword());
         }
         if (taskNumber < 1 || taskNumber > taskListSize) {
             throw new InvalidTaskNumberException(taskNumber);
@@ -178,13 +186,13 @@ public class Panda {
      * Written by Codex: Reuse one validation rule for Todo, Deadline, and Event.
      *
      * @param description the parsed task description
-     * @param taskType the command's task type
+     * @param command the task-creation command being processed
      * @throws EmptyDescriptionException if the description is blank
      */
-    private static void ensureDescription(String description, String taskType)
+    private static void ensureDescription(String description, Command command)
             throws EmptyDescriptionException {
         if (description.isBlank()) {
-            throw new EmptyDescriptionException(taskType);
+            throw new EmptyDescriptionException(command.getKeyword());
         }
     }
 }
