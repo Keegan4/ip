@@ -36,7 +36,7 @@ public class Panda {
                 for (int i = 0; i < taskCount; i++) {
                     String status = tasks[i].isDone() ? "X" : " ";
                     System.out.printf("%d.[%s][%s] %s%n", i + 1, tasks[i].getTypeMarker(), status,
-                            tasks[i].getName());
+                            tasks[i].getDisplayText());
                 }
             }
             else if (msg.startsWith("mark ")) {
@@ -69,6 +69,24 @@ public class Panda {
                     }
                 } catch (NumberFormatException exception) {
                     System.out.println("Please provide a valid task number.");
+                }
+            }
+            else if (msg.startsWith("deadline ")) {
+                // Written by Codex: Split deadline input without validating the date/time text.
+                String deadlineDetails = msg.substring("deadline ".length()).trim();
+                String separator = deadlineDetails.contains(" /by ") ? " /by " : " by ";
+                int separatorIndex = deadlineDetails.indexOf(separator);
+                if (separatorIndex <= 0 || separatorIndex + separator.length() >= deadlineDetails.length()) {
+                    System.out.println("Please use: deadline <description> /by <date or time>.");
+                } else {
+                    String taskName = deadlineDetails.substring(0, separatorIndex).trim();
+                    String by = deadlineDetails.substring(separatorIndex + separator.length()).trim();
+                    Task task = new Deadline(taskName, by);
+                    tasks[taskCount] = task;
+                    taskCount++;
+                    System.out.println("Got it. I've added this task:");
+                    System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getDisplayText());
+                    System.out.printf("Now you have %d tasks in the list.%n", taskCount);
                 }
             }
             else if (msg.startsWith("todo ")) {

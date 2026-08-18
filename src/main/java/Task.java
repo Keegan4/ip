@@ -58,4 +58,16 @@ public abstract class Task {
      * @return the task type marker
      */
     public abstract String getTypeMarker();
+
+    /**
+     * Returns the task text to show in confirmations and task lists.
+     *
+     * Written by Codex: Provide a default display value that dated task
+     * subclasses can extend with their own details.
+     *
+     * @return the formatted task description
+     */
+    public String getDisplayText() {
+        return name;
+    }
 }
