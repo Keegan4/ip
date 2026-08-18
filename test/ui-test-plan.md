@@ -2,7 +2,7 @@
 
 ## Configuration
 
-- Setup command: `javac -d build/classes src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Panda.java`
+- Setup command: `javac -d build/classes src/main/java/PandaException.java src/main/java/EmptyDescriptionException.java src/main/java/InvalidCommandException.java src/main/java/InvalidTaskNumberException.java src/main/java/MissingDateTimeException.java src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Panda.java`
 - Run command: `java -cp build/classes Panda`
 - Timeout seconds: `10`
 
@@ -295,6 +295,115 @@ Hello! I'm Panda.
 What can I do for you?
 ____________________________________________________________
 OOPS!!! I'm bamboo-zled; I don't know what that means :-(
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Reject missing deadline and event descriptions
+
+Aim: Verify that task-creation commands without descriptions throw consistent EmptyDescriptionException messages.
+
+Input:
+
+```text
+deadline
+event
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+OOPS!!! This panda needs a deadline description before it can get to work.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs an event description before it can get to work.
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Reject missing deadline and event timing details
+
+Aim: Verify that incomplete deadline and event commands report their required structures through MissingDateTimeException.
+
+Input:
+
+```text
+deadline submit report
+event project meeting /from Monday
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+OOPS!!! This panda needs more timing details. Try: deadline <description> /by <date or time>.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs more timing details. Try: event <description> /from <start> /to <end>.
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Reject invalid task numbers
+
+Aim: Verify that mark and unmark reject missing, non-numeric, and out-of-range task numbers through InvalidTaskNumberException.
+
+Input:
+
+```text
+mark
+unmark bamboo
+mark 1
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+OOPS!!! This panda needs a valid task number after mark.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid task number after unmark.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda cannot find task 1 in the bamboo stack.
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
