@@ -373,7 +373,7 @@ ____________________________________________________________
 
 ## Test Case: Reject invalid task numbers
 
-Aim: Verify that mark and unmark reject missing, non-numeric, and out-of-range task numbers through InvalidTaskNumberException.
+Aim: Verify that mark, unmark, and delete reject missing, non-numeric, and out-of-range task numbers through InvalidTaskNumberException.
 
 Input:
 
@@ -381,6 +381,8 @@ Input:
 mark
 unmark bamboo
 mark 1
+delete bamboo
+delete 1
 bye
 ```
 
@@ -404,6 +406,69 @@ OOPS!!! This panda needs a valid task number after unmark.
 ____________________________________________________________
 ____________________________________________________________
 OOPS!!! This panda cannot find task 1 in the bamboo stack.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid task number after delete.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda cannot find task 1 in the bamboo stack.
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Delete a task and close the array gap
+
+Aim: Verify that `delete` reports the removed task, shifts later array entries left, and updates the task count without using a collection.
+
+Input:
+
+```text
+todo read book
+event project meeting /from Aug 6th 2pm /to 4pm
+todo borrow book
+delete 2
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] borrow book
+Now you have 3 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Noted. I've removed this task:
+  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][ ] read book
+2.[T][ ] borrow book
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!

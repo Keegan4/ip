@@ -1,5 +1,5 @@
 /**
- * Signals that a mark or unmark command does not identify an existing task.
+ * Signals that a mark, unmark, or delete command does not identify an existing task.
  *
  * Written by Codex: Convert missing, non-numeric, and out-of-range task numbers
  * into clear user-facing errors.

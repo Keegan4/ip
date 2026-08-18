@@ -55,6 +55,20 @@ public class Panda {
                     tasks[taskNumber - 1].unmark();
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.printf("  [ ] %s%n", tasks[taskNumber - 1].getName());
+                } else if (msg.equals("delete") || msg.startsWith("delete ")) {
+                    // Written by Codex: Remove an array entry by shifting later tasks one slot left.
+                    int taskNumber = parseTaskNumber(msg, "delete", taskCount);
+                    Task removedTask = tasks[taskNumber - 1];
+                    for (int i = taskNumber; i < taskCount; i++) {
+                        tasks[i - 1] = tasks[i];
+                    }
+                    tasks[taskCount - 1] = null;
+                    taskCount--;
+                    String status = removedTask.isDone() ? "X" : " ";
+                    System.out.println("Noted. I've removed this task:");
+                    System.out.printf("  [%s][%s] %s%n", removedTask.getTypeMarker(), status,
+                            removedTask.getDisplayText());
+                    System.out.printf("Now you have %d tasks in the list.%n", taskCount);
                 } else if (msg.equals("event") || msg.startsWith("event ")) {
                     // Written by Codex: Split event input without validating either date/time value.
                     String eventDetails = msg.substring("event".length()).trim();
@@ -132,7 +146,7 @@ public class Panda {
     }
 
     /**
-     * Parses and validates the one-based task number used by mark and unmark.
+     * Parses and validates the one-based task number used by mark, unmark, and delete.
      *
      * Written by Codex: Translate Java number-format failures into a domain-specific error.
      *
