@@ -55,6 +55,22 @@ public class Panda {
                     System.out.println("Please provide a valid task number.");
                 }
             }
+            else if (msg.startsWith("unmark ")) {
+                // Written by Codex: Reverse the completion state of the selected task.
+                String taskNumberText = msg.substring("unmark ".length()).trim();
+                try {
+                    int taskNumber = Integer.parseInt(taskNumberText);
+                    if (taskNumber >= 1 && taskNumber <= messageCount) {
+                        done[taskNumber - 1] = false;
+                        System.out.println("OK, I've marked this task as not done yet:");
+                        System.out.printf("  [ ] %s%n", messages[taskNumber - 1]);
+                    } else {
+                        System.out.println("I couldn't find that task.");
+                    }
+                } catch (NumberFormatException exception) {
+                    System.out.println("Please provide a valid task number.");
+                }
+            }
             else {
                 // Written by Codex: Add ordinary user input as a new, initially unfinished task.
                 System.out.println(msg);
