@@ -4,7 +4,7 @@
  * Written by Codex: Keep a task's name and completion status together so that
  * status changes are handled by the task itself.
  */
-public class Task {
+public abstract class Task {
     private final String name;
     private boolean done;
 
@@ -49,4 +49,13 @@ public class Task {
     public void unmark() {
         done = false;
     }
+
+    /**
+     * Returns the letter used to identify this kind of task in the list.
+     *
+     * Written by Codex: Let each task subtype supply its own display marker.
+     *
+     * @return the task type marker
+     */
+    public abstract String getTypeMarker();
 }

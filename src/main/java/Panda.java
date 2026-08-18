@@ -35,7 +35,8 @@ public class Panda {
                 System.out.println("Here are the tasks in your list:");
                 for (int i = 0; i < taskCount; i++) {
                     String status = tasks[i].isDone() ? "X" : " ";
-                    System.out.printf("%d.[%s] %s%n", i + 1, status, tasks[i].getName());
+                    System.out.printf("%d.[%s][%s] %s%n", i + 1, tasks[i].getTypeMarker(), status,
+                            tasks[i].getName());
                 }
             }
             else if (msg.startsWith("mark ")) {
@@ -70,10 +71,24 @@ public class Panda {
                     System.out.println("Please provide a valid task number.");
                 }
             }
+            else if (msg.startsWith("todo ")) {
+                // Written by Codex: Create a Todo so date-free tasks inherit Task behavior.
+                String taskName = msg.substring("todo ".length()).trim();
+                if (taskName.isEmpty()) {
+                    System.out.println("Please provide a task description.");
+                } else {
+                    Task task = new Todo(taskName);
+                    tasks[taskCount] = task;
+                    taskCount++;
+                    System.out.println("Got it. I've added this task:");
+                    System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getName());
+                    System.out.printf("Now you have %d tasks in the list.%n", taskCount);
+                }
+            }
             else {
-                // Written by Codex: Add ordinary user input as a new, initially unfinished task.
+                // Written by Codex: Treat ordinary user input as a date-free Todo task.
                 System.out.println(msg);
-                tasks[taskCount] = new Task(msg);
+                tasks[taskCount] = new Todo(msg);
                 taskCount++;
 
             }
