@@ -13,8 +13,8 @@ Aim: Verify that `mark` changes the selected task to done and that `list` displa
 Input:
 
 ```text
-read book
-return book
+todo read book
+todo return book
 mark 2
 list
 bye
@@ -33,10 +33,14 @@ ____________________________________________________________
 Hello! I'm Panda.
 What can I do for you?
 ____________________________________________________________
-read book
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
-return book
+Got it. I've added this task:
+  [T][ ] return book
+Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
@@ -59,8 +63,8 @@ Aim: Verify that `unmark` reverses a completed task's status and that `list` dis
 Input:
 
 ```text
-read book
-return book
+todo read book
+todo return book
 mark 2
 unmark 2
 list
@@ -80,10 +84,14 @@ ____________________________________________________________
 Hello! I'm Panda.
 What can I do for you?
 ____________________________________________________________
-read book
+Got it. I've added this task:
+  [T][ ] read book
+Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
-return book
+Got it. I've added this task:
+  [T][ ] return book
+Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Nice! I've marked this task as done:
@@ -225,6 +233,68 @@ ____________________________________________________________
 Here are the tasks in your list:
 1.[E][ ] team project meeting (from: 2/10/2019 2pm to: 4pm)
 2.[E][ ] orientation week (from: 4/10/2019 to: 11/10/2019)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Reject a to-do with no description
+
+Aim: Verify that `todo` without a description reports a panda-themed error and does not add a task.
+
+Input:
+
+```text
+todo
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+OOPS!!! This panda needs a todo description before it can get to work.
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Reject an unknown command
+
+Aim: Verify that an unrecognized command reports a panda-themed error and does not add a task.
+
+Input:
+
+```text
+blah
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+OOPS!!! I'm bamboo-zled; I don't know what that means :-(
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!

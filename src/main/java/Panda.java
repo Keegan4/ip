@@ -112,11 +112,11 @@ public class Panda {
                     System.out.printf("Now you have %d tasks in the list.%n", taskCount);
                 }
             }
-            else if (msg.startsWith("todo ")) {
-                // Written by Codex: Create a Todo so date-free tasks inherit Task behavior.
-                String taskName = msg.substring("todo ".length()).trim();
+            else if (msg.equals("todo") || msg.startsWith("todo ")) {
+                // Written by Codex: Reject a Todo that has no description to store.
+                String taskName = msg.substring("todo".length()).trim();
                 if (taskName.isEmpty()) {
-                    System.out.println("Please provide a task description.");
+                    System.out.println("OOPS!!! This panda needs a todo description before it can get to work.");
                 } else {
                     Task task = new Todo(taskName);
                     tasks[taskCount] = task;
@@ -127,11 +127,8 @@ public class Panda {
                 }
             }
             else {
-                // Written by Codex: Treat ordinary user input as a date-free Todo task.
-                System.out.println(msg);
-                tasks[taskCount] = new Todo(msg);
-                taskCount++;
-
+                // Written by Codex: Respond to unknown input without adding an accidental task.
+                System.out.println("OOPS!!! I'm bamboo-zled; I don't know what that means :-(");
             }
             System.out.println(divider);
             msg = scanner.nextLine();
