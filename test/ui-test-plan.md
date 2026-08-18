@@ -2,7 +2,7 @@
 
 ## Configuration
 
-- Setup command: `javac -d build/classes src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Panda.java`
+- Setup command: `javac -d build/classes src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Panda.java`
 - Run command: `java -cp build/classes Panda`
 - Timeout seconds: `10`
 
@@ -180,6 +180,51 @@ ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
 2.[D][ ] submit report (by: 11/10/2019 5pm)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Add events with start and end values
+
+Aim: Verify that `event` creates Event tasks and preserves both supplied date/time values in confirmations and lists.
+
+Input:
+
+```text
+event team project meeting /from 2/10/2019 2pm /to 4pm
+event orientation week /from 4/10/2019 /to 11/10/2019
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] team project meeting (from: 2/10/2019 2pm to: 4pm)
+Now you have 1 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Got it. I've added this task:
+  [E][ ] orientation week (from: 4/10/2019 to: 11/10/2019)
+Now you have 2 tasks in the list.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[E][ ] team project meeting (from: 2/10/2019 2pm to: 4pm)
+2.[E][ ] orientation week (from: 4/10/2019 to: 11/10/2019)
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!

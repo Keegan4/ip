@@ -71,6 +71,29 @@ public class Panda {
                     System.out.println("Please provide a valid task number.");
                 }
             }
+            else if (msg.startsWith("event ")) {
+                // Written by Codex: Split event input without validating either date/time value.
+                String eventDetails = msg.substring("event ".length()).trim();
+                String fromSeparator = eventDetails.contains(" /from ") ? " /from " : " from ";
+                String toSeparator = eventDetails.contains(" /to ") ? " /to " : " to ";
+                int fromIndex = eventDetails.indexOf(fromSeparator);
+                int toIndex = eventDetails.indexOf(toSeparator,
+                        fromIndex < 0 ? 0 : fromIndex + fromSeparator.length());
+                if (fromIndex <= 0 || toIndex <= fromIndex + fromSeparator.length()
+                        || toIndex + toSeparator.length() >= eventDetails.length()) {
+                    System.out.println("Please use: event <description> /from <start> /to <end>.");
+                } else {
+                    String taskName = eventDetails.substring(0, fromIndex).trim();
+                    String from = eventDetails.substring(fromIndex + fromSeparator.length(), toIndex).trim();
+                    String to = eventDetails.substring(toIndex + toSeparator.length()).trim();
+                    Task task = new Event(taskName, from, to);
+                    tasks[taskCount] = task;
+                    taskCount++;
+                    System.out.println("Got it. I've added this task:");
+                    System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getDisplayText());
+                    System.out.printf("Now you have %d tasks in the list.%n", taskCount);
+                }
+            }
             else if (msg.startsWith("deadline ")) {
                 // Written by Codex: Split deadline input without validating the date/time text.
                 String deadlineDetails = msg.substring("deadline ".length()).trim();
