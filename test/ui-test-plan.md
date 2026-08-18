@@ -418,9 +418,9 @@ Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-## Test Case: Delete a task and close the array gap
+## Test Case: Delete a task from the ArrayList
 
-Aim: Verify that `delete` reports the removed task, shifts later array entries left, and updates the task count without using a collection.
+Aim: Verify that `delete` reports the removed task, preserves the order of the remaining ArrayList entries, and updates the task count.
 
 Input:
 
