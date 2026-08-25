@@ -1,0 +1,5 @@
+T | 1 | read book
+T | bamboo | invalid status task
+D | 0 | return book | June 6th
+Q | 0 | invalid type task
+E | 0 | project meeting | Aug 6th 2pm | 4pm

@@ -2,8 +2,8 @@
 
 ## Configuration
 
-- Setup command: `javac -d build/classes src/main/java/PandaException.java src/main/java/EmptyDescriptionException.java src/main/java/InvalidCommandException.java src/main/java/InvalidTaskNumberException.java src/main/java/MissingDateTimeException.java src/main/java/Command.java src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Panda.java`
-- Run command: `java -cp build/classes Panda`
+- Setup command: `javac -d build/classes src/main/java/PandaException.java src/main/java/EmptyDescriptionException.java src/main/java/InvalidCommandException.java src/main/java/InvalidTaskNumberException.java src/main/java/MissingDateTimeException.java src/main/java/DataLoadingException.java src/main/java/Command.java src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Panda.java`
+- Run command: `java -cp build/classes Panda test/data/ui-empty-tasks.txt`
 - Timeout seconds: `10`
 
 ## Test Case: Mark a task as done
@@ -50,6 +50,83 @@ ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
 2.[T][X] return book
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Load stored tasks when Panda starts
+
+Aim: Verify that startup loading reconstructs each task subtype and restores its completion status in the ArrayList.
+
+Run command: `java -cp build/classes Panda test/data/ui-valid-tasks.txt`
+
+Input:
+
+```text
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[D][ ] return book (by: June 6th)
+3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+4.[T][X] join sports club
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Report and skip malformed stored task data
+
+Aim: Verify that every malformed record is reported and skipped while valid records before and after them are loaded.
+
+Run command: `java -cp build/classes Panda test/data/ui-malformed-tasks.txt`
+
+Input:
+
+```text
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+Line 2 has an invalid completion status; expected 0 or 1.
+Line 4 has an invalid task type; expected T, D, or E.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[D][ ] return book (by: June 6th)
+3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
