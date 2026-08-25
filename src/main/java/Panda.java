@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -7,10 +10,13 @@ import java.util.Scanner;
  * Written by Codex: Coordinates command parsing, task storage, and user-facing output.
  */
 public class Panda {
+    /** Written by Codex: Use the student's existing location as Panda's default data file. */
+    private static final String DEFAULT_DATA_FILE_PATH = "src/main/data/info.txt";
+
     /**
      * Starts the Panda chatbot and displays its greeting and closing messages.
      *  The ascii art and dividers are created by codex.
-     * @param args command-line arguments (not used)
+     * @param args an optional first argument overriding the data file path
      */
     public static void main(String[] args) {
         String divider = "____________________________________________________________";
@@ -33,6 +39,23 @@ public class Panda {
         Scanner scanner = new Scanner(System.in);
         // Written by Codex: Let ArrayList grow as tasks are added and manage element removal.
         ArrayList<Task> tasks = new ArrayList<>();
+        // Written by Codex: Allow tests to supply a fixture while retaining the existing default path.
+        File dataFile = new File(args.length > 0 ? args[0] : DEFAULT_DATA_FILE_PATH);
+        ArrayList<DataLoadingException> loadingErrors = new ArrayList<>();
+        try {
+            loadingErrors = loadTasks(tasks, dataFile);
+        } catch (DataLoadingException exception) {
+            // Written by Codex: Treat a file-access failure as a startup loading error.
+            loadingErrors.add(exception);
+        }
+        if (!loadingErrors.isEmpty()) {
+            // Written by Codex: Prompt the user about every invalid record at the UI boundary.
+            System.out.println(divider);
+            for (DataLoadingException loadingError : loadingErrors) {
+                System.out.println(loadingError.getMessage());
+            }
+            System.out.println(divider);
+        }
         // Written by Codex: Treat a closed input stream as a graceful end to the session.
         while (scanner.hasNextLine()) {
             String msg = scanner.nextLine();
@@ -193,6 +216,127 @@ public class Panda {
             throws EmptyDescriptionException {
         if (description.isBlank()) {
             throw new EmptyDescriptionException(command.getKeyword());
+        }
+    }
+
+    /**
+     * Loads all valid task records from a data file into the supplied task list.
+     *
+     * Written by Codex: Keep valid records while skipping malformed records,
+     * and use a temporary list so file-access failures do not load partial data.
+     *
+     * @param tasks the application's task list
+     * @param dataFile the file containing stored task records
+     * @return the errors for malformed records that were skipped
+     * @throws DataLoadingException if the file exists but cannot be read
+     */
+    private static ArrayList<DataLoadingException> loadTasks(ArrayList<Task> tasks, File dataFile)
+            throws DataLoadingException {
+        ArrayList<DataLoadingException> loadingErrors = new ArrayList<>();
+        if (!dataFile.exists()) {
+            // Written by Codex: A first run has no data file and should start with an empty list.
+            return loadingErrors;
+        }
+
+        ArrayList<Task> loadedTasks = new ArrayList<>();
+        try (Scanner fileScanner = new Scanner(dataFile, StandardCharsets.UTF_8)) {
+            int lineNumber = 0;
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine();
+                lineNumber++;
+                if (!line.isBlank()) {
+                    try {
+                        loadedTasks.add(parseStoredTask(line, lineNumber));
+                    } catch (DataLoadingException exception) {
+                        // Written by Codex: Record this invalid line for the UI, then continue loading.
+                        loadingErrors.add(exception);
+                    }
+                }
+            }
+        } catch (IOException exception) {
+            throw new DataLoadingException(dataFile.getPath(), exception);
+        }
+        tasks.addAll(loadedTasks);
+        return loadingErrors;
+    }
+
+    /**
+     * Converts one pipe-separated data record into its corresponding Task subtype.
+     *
+     * Written by Codex: Validate the stored type, status, and required fields
+     * before creating a task object.
+     *
+     * @param line one complete line from the data file
+     * @param lineNumber the one-based line number used in error messages
+     * @return the task represented by the stored record
+     * @throws DataLoadingException if the record does not follow the storage format
+     */
+    private static Task parseStoredTask(String line, int lineNumber)
+            throws DataLoadingException {
+        String[] fields = line.split("\\s*\\|\\s*", -1);
+        if (fields.length < 3 || fields[2].isBlank()) {
+            throw new DataLoadingException(lineNumber, "no task description.");
+        }
+
+        Task task = switch (fields[0]) {
+        case "T" -> {
+            ensureStoredFieldCount(fields, 3, lineNumber, "todo");
+            yield new Todo(fields[2]);
+        }
+        case "D" -> {
+            ensureStoredFieldCount(fields, 4, lineNumber, "deadline");
+            ensureStoredValue(fields[3], lineNumber, "no deadline time.");
+            yield new Deadline(fields[2], fields[3]);
+        }
+        case "E" -> {
+            ensureStoredFieldCount(fields, 5, lineNumber, "event");
+            ensureStoredValue(fields[3], lineNumber, "no event start time.");
+            ensureStoredValue(fields[4], lineNumber, "no event end time.");
+            yield new Event(fields[2], fields[3], fields[4]);
+        }
+        default -> throw new DataLoadingException(lineNumber,
+                "an invalid task type; expected T, D, or E.");
+        };
+
+        if (fields[1].equals("1")) {
+            task.mark();
+        } else if (!fields[1].equals("0")) {
+            throw new DataLoadingException(lineNumber,
+                    "an invalid completion status; expected 0 or 1.");
+        }
+        return task;
+    }
+
+    /**
+     * Checks that a stored record has the number of fields required by its type.
+     *
+     * @param fields the parsed record fields
+     * @param expectedCount the required number of fields
+     * @param lineNumber the data file line number
+     * @param taskType the task type used in the error message
+     * @throws DataLoadingException if the field count is incorrect
+     */
+    private static void ensureStoredFieldCount(String[] fields, int expectedCount,
+            int lineNumber, String taskType) throws DataLoadingException {
+        if (fields.length != expectedCount) {
+            throw new DataLoadingException(lineNumber,
+                    "an invalid " + taskType + " field count; expected "
+                            + expectedCount + " fields.");
+        }
+    }
+
+    /**
+     * Checks that a required stored field contains a value.
+     *
+     * @param value the stored field value
+     * @param lineNumber the data file line number
+     * @param errorMessage the reason reported when the field is blank
+     * @throws DataLoadingException if the value is blank
+     */
+    private static void ensureStoredValue(String value, int lineNumber, String errorMessage)
+            throws DataLoadingException {
+        if (value.isBlank()) {
+            throw new DataLoadingException(lineNumber, errorMessage);
         }
     }
 }
