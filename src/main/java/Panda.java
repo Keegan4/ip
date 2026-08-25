@@ -1,7 +1,7 @@
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -11,8 +11,11 @@ import java.util.Scanner;
  * Written by Codex: Coordinates command parsing, task storage, and user-facing output.
  */
 public class Panda {
-    /** Written by Codex: Use the student's existing location as Panda's default data file. */
-    private static final String DEFAULT_DATA_FILE_PATH = "src/main/data/info.txt";
+    /**
+     * Written by Codex: Build a relative default path from OS-independent components.
+     */
+    private static final Path DEFAULT_DATA_FILE_PATH =
+            Path.of("src", "main", "data", "info.txt");
 
     /**
      * Starts the Panda chatbot and displays its greeting and closing messages.
@@ -41,7 +44,7 @@ public class Panda {
         // Written by Codex: Let ArrayList grow as tasks are added and manage element removal.
         ArrayList<Task> tasks = new ArrayList<>();
         // Written by Codex: Allow tests to supply a fixture while retaining the existing default path.
-        File dataFile = new File(args.length > 0 ? args[0] : DEFAULT_DATA_FILE_PATH);
+        Path dataFile = args.length > 0 ? Path.of(args[0]) : DEFAULT_DATA_FILE_PATH;
         ArrayList<DataLoadingException> loadingErrors = new ArrayList<>();
         try {
             loadingErrors = loadTasks(tasks, dataFile);
@@ -237,10 +240,10 @@ public class Panda {
      * @return the errors for malformed records that were skipped
      * @throws DataLoadingException if the file exists but cannot be read
      */
-    private static ArrayList<DataLoadingException> loadTasks(ArrayList<Task> tasks, File dataFile)
+    private static ArrayList<DataLoadingException> loadTasks(ArrayList<Task> tasks, Path dataFile)
             throws DataLoadingException {
         ArrayList<DataLoadingException> loadingErrors = new ArrayList<>();
-        if (!dataFile.exists()) {
+        if (Files.notExists(dataFile)) {
             // Written by Codex: A first run has no data file and should start with an empty list.
             return loadingErrors;
         }
@@ -261,7 +264,7 @@ public class Panda {
                 }
             }
         } catch (IOException exception) {
-            throw new DataLoadingException(dataFile.getPath(), exception);
+            throw new DataLoadingException(dataFile.toString(), exception);
         }
         tasks.addAll(loadedTasks);
         return loadingErrors;
@@ -395,7 +398,7 @@ public class Panda {
      * @param dataFile the file that stores the tasks
      * @throws DataSavingException if the destination cannot be created or written
      */
-    private static void saveTasks(ArrayList<Task> tasks, File dataFile)
+    private static void saveTasks(ArrayList<Task> tasks, Path dataFile)
             throws DataSavingException {
         StringBuilder storedData = new StringBuilder();
         for (int i = 0; i < tasks.size(); i++) {
@@ -406,11 +409,11 @@ public class Panda {
         }
 
         try {
-            File parentDirectory = dataFile.getParentFile();
+            Path parentDirectory = dataFile.getParent();
             if (parentDirectory != null) {
-                Files.createDirectories(parentDirectory.toPath());
+                Files.createDirectories(parentDirectory);
             }
-            Files.writeString(dataFile.toPath(), storedData, StandardCharsets.UTF_8);
+            Files.writeString(dataFile, storedData, StandardCharsets.UTF_8);
         } catch (IOException exception) {
             throw new DataSavingException(exception);
         }

@@ -617,7 +617,7 @@ ____________________________________________________________
 
 Aim: Verify that a task remains available in memory and DataSavingException reports an unwritable storage destination.
 
-Run command: `java -cp build/classes Panda test/data/ui-valid-tasks.txt/tasks.txt`
+Run command: `python test/run_panda_ui.py --unwritable`
 
 Input:
 
@@ -648,6 +648,41 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] borrow book
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Create a missing data file and parent folders
+
+Aim: Verify that a first run starts without errors and creates the relative data file and missing folders when a task is added.
+
+Run command: `python test/run_panda_ui.py --missing-parent --expected-data test/data/ui-expected-first-run.txt`
+
+Input:
+
+```text
+todo first task
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+Got it. I've added this task:
+  [T][ ] first task
+Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!

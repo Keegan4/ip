@@ -25,14 +25,27 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--fixture", help="existing data copied into the temporary file")
     parser.add_argument("--expected-data", help="file containing the expected saved data")
+    parser.add_argument("--missing-parent", action="store_true",
+                        help="start with both the data file and its parent folders absent")
+    parser.add_argument("--unwritable", action="store_true",
+                        help="use a regular file where Panda needs a parent directory")
     args = parser.parse_args()
 
-    # Written by Codex: Close the temporary file before Java opens it on Windows.
-    with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as temporary_file:
-        data_path = Path(temporary_file.name)
+    # Written by Codex: Construct every test path with pathlib for cross-platform separators.
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        test_root = Path(temporary_directory)
+        if args.missing_parent:
+            data_path = test_root / "missing" / "data" / "tasks.txt"
+        elif args.unwritable:
+            blocked_parent = test_root / "not-a-directory"
+            blocked_parent.write_text("blocks directory creation", encoding="utf-8")
+            data_path = blocked_parent / "tasks.txt"
+        else:
+            data_path = test_root / "tasks.txt"
+            data_path.touch()
 
-    try:
         if args.fixture:
+            data_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(args.fixture, data_path)
 
         result = subprocess.run(
@@ -55,8 +68,6 @@ def main() -> int:
                 print(f"Expected data:\n{expected_data}", file=sys.stderr)
                 return 1
         return 0
-    finally:
-        data_path.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
