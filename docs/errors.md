@@ -15,6 +15,10 @@ This file lists all anticipated user-input errors in the current command-line in
 | Startup data loading | A stored record has an unknown task type, invalid completion status, missing field, or incorrect number of fields | `DataLoadingException` handled at the individual-record boundary | `Line <number> has <error>`; skip that record and continue loading valid records. |
 | Startup data loading | The configured data file exists but cannot be opened or read | `DataLoadingException` | `OOPS!!! This panda cannot read its bamboo archive at <path>.` |
 | Startup data loading | The configured data file does not exist | No exception; treated as the first run | Start with an empty task list. |
+| Saving after a task-list change | The data file or its parent directory cannot be created or written | `DataSavingException` | `OOPS!!! This panda could not save its bamboo archive.` The in-memory change remains available for the current session. |
 | Input stream closes | No more console input is available | No exception; handled with `Scanner.hasNextLine()` | End the session cleanly and print the farewell message. |
 
 `PandaException` is the checked base class for expected input problems. The UI catches only this base type, allowing unexpected Java runtime and programming errors to remain visible during development.
+
+Task fields use ` | ` as the storage delimiter. A pipe or backslash entered by
+the user is prefixed with a backslash in the file and decoded again when loaded.

@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -84,6 +85,7 @@ public class Panda {
                     task.mark();
                     System.out.println("Nice! I've marked this task as done:");
                     System.out.printf("  [X] %s%n", task.getName());
+                    saveTasks(tasks, dataFile);
                 }
                 case UNMARK -> {
                     // Written by Codex: Convert invalid unmark arguments into a PandaException.
@@ -92,6 +94,7 @@ public class Panda {
                     task.unmark();
                     System.out.println("OK, I've marked this task as not done yet:");
                     System.out.printf("  [ ] %s%n", task.getName());
+                    saveTasks(tasks, dataFile);
                 }
                 case DELETE -> {
                     // Written by Codex: Let ArrayList remove the task and close the index gap.
@@ -102,6 +105,7 @@ public class Panda {
                     System.out.printf("  [%s][%s] %s%n", removedTask.getTypeMarker(), status,
                             removedTask.getDisplayText());
                     System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
+                    saveTasks(tasks, dataFile);
                 }
                 case EVENT -> {
                     // Written by Codex: Split event input without validating either date/time value.
@@ -129,6 +133,7 @@ public class Panda {
                         System.out.println("Got it. I've added this task:");
                         System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getDisplayText());
                         System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
+                        saveTasks(tasks, dataFile);
                     }
                 }
                 case DEADLINE -> {
@@ -152,6 +157,7 @@ public class Panda {
                         System.out.println("Got it. I've added this task:");
                         System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getDisplayText());
                         System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
+                        saveTasks(tasks, dataFile);
                     }
                 }
                 case TODO -> {
@@ -163,6 +169,7 @@ public class Panda {
                     System.out.println("Got it. I've added this task:");
                     System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getName());
                     System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
+                    saveTasks(tasks, dataFile);
                 }
                 case BYE -> throw new IllegalStateException("The bye command should exit before dispatch.");
                 }
@@ -273,7 +280,7 @@ public class Panda {
      */
     private static Task parseStoredTask(String line, int lineNumber)
             throws DataLoadingException {
-        String[] fields = line.split("\\s*\\|\\s*", -1);
+        String[] fields = splitStoredFields(line);
         if (fields.length < 3 || fields[2].isBlank()) {
             throw new DataLoadingException(lineNumber, "no task description.");
         }
@@ -337,6 +344,75 @@ public class Panda {
             throws DataLoadingException {
         if (value.isBlank()) {
             throw new DataLoadingException(lineNumber, errorMessage);
+        }
+    }
+
+    /**
+     * Splits a stored record while preserving escaped pipes and backslashes.
+     *
+     * Written by Codex: Read user-supplied delimiter characters without
+     * mistaking them for boundaries between stored fields.
+     *
+     * @param line one stored task record
+     * @return the decoded fields in the record
+     */
+    private static String[] splitStoredFields(String line) {
+        ArrayList<String> fields = new ArrayList<>();
+        StringBuilder currentField = new StringBuilder();
+        boolean escaping = false;
+
+        for (int i = 0; i < line.length(); i++) {
+            char character = line.charAt(i);
+            if (escaping) {
+                if (character != '\\' && character != '|') {
+                    currentField.append('\\');
+                }
+                currentField.append(character);
+                escaping = false;
+            } else if (character == '\\') {
+                escaping = true;
+            } else if (character == '|') {
+                fields.add(currentField.toString().trim());
+                currentField.setLength(0);
+            } else {
+                currentField.append(character);
+            }
+        }
+        if (escaping) {
+            currentField.append('\\');
+        }
+        fields.add(currentField.toString().trim());
+        return fields.toArray(String[]::new);
+    }
+
+    /**
+     * Rewrites the data file so it exactly matches the in-memory task list.
+     *
+     * Written by Codex: Saving the complete list makes additions, status
+     * changes, and deletions persistent through the same simple operation.
+     *
+     * @param tasks the current tasks in display order
+     * @param dataFile the file that stores the tasks
+     * @throws DataSavingException if the destination cannot be created or written
+     */
+    private static void saveTasks(ArrayList<Task> tasks, File dataFile)
+            throws DataSavingException {
+        StringBuilder storedData = new StringBuilder();
+        for (int i = 0; i < tasks.size(); i++) {
+            if (i > 0) {
+                storedData.append(System.lineSeparator());
+            }
+            storedData.append(tasks.get(i).toDataString());
+        }
+
+        try {
+            File parentDirectory = dataFile.getParentFile();
+            if (parentDirectory != null) {
+                Files.createDirectories(parentDirectory.toPath());
+            }
+            Files.writeString(dataFile.toPath(), storedData, StandardCharsets.UTF_8);
+        } catch (IOException exception) {
+            throw new DataSavingException(exception);
         }
     }
 }

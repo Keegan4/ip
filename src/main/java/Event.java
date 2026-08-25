@@ -40,4 +40,15 @@ public class Event extends Task {
     public String getDisplayText() {
         return getName() + " (from: " + from + " to: " + to + ")";
     }
+
+    /**
+     * Converts this event into one line of Panda's storage format.
+     *
+     * @return the common task fields followed by the start and end values
+     */
+    @Override
+    public String toDataString() {
+        return super.toDataString() + " | " + escapeDataField(from)
+                + " | " + escapeDataField(to);
+    }
 }

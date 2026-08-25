@@ -37,4 +37,14 @@ public class Deadline extends Task {
     public String getDisplayText() {
         return getName() + " (by: " + by + ")";
     }
+
+    /**
+     * Converts this deadline into one line of Panda's storage format.
+     *
+     * @return the common task fields followed by the deadline value
+     */
+    @Override
+    public String toDataString() {
+        return super.toDataString() + " | " + escapeDataField(by);
+    }
 }
