@@ -2,7 +2,7 @@
 
 ## Configuration
 
-- Setup command: `javac -d build/classes src/main/java/PandaException.java src/main/java/EmptyDescriptionException.java src/main/java/InvalidCommandException.java src/main/java/InvalidTaskNumberException.java src/main/java/MissingDateTimeException.java src/main/java/DataLoadingException.java src/main/java/DataSavingException.java src/main/java/Command.java src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Panda.java`
+- Setup command: `javac -d build/classes src/main/java/PandaException.java src/main/java/EmptyDescriptionException.java src/main/java/InvalidCommandException.java src/main/java/InvalidTaskNumberException.java src/main/java/MissingDateTimeException.java src/main/java/InvalidDateException.java src/main/java/DataLoadingException.java src/main/java/DataSavingException.java src/main/java/Command.java src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Panda.java`
 - Run command: `python test/run_panda_ui.py`
 - Timeout seconds: `10`
 
@@ -84,10 +84,49 @@ What can I do for you?
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] read book
-2.[D][ ] return book (by: June 6th)
-3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+2.[D][ ] return book (by: Jun 06 2019 18:00)
+3.[E][ ] project meeting (from: Aug 06 2019 14:00 to: Aug 08 2019 16:00)
 4.[T][X] join sports club
 5.[T][ ] buy bread | milk
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Filter dated tasks by date
+
+Aim: Verify that `list yyyy-MM-dd` shows matching deadlines and multi-day events with their original task numbers while excluding date-free and nonmatching tasks.
+
+Run command: `python test/run_panda_ui.py --fixture test/data/ui-valid-tasks.txt`
+
+Input:
+
+```text
+list 2019-06-06
+list 2019-08-07
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+Here are the tasks in your list:
+2.[D][ ] return book (by: Jun 06 2019 18:00)
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+3.[E][ ] project meeting (from: Aug 06 2019 14:00 to: Aug 08 2019 16:00)
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
@@ -126,8 +165,8 @@ ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][X] read book
-2.[D][ ] return book (by: June 6th)
-3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+2.[D][ ] return book (by: Jun 06 2019 18:00)
+3.[E][ ] project meeting (from: Aug 06 2019 14:00 to: Aug 06 2019 16:00)
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
@@ -227,15 +266,15 @@ Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-## Test Case: Add a deadline without date validation
+## Test Case: Add a deadline with a valid date and time
 
-Aim: Verify that `deadline` creates a Deadline task and preserves the supplied date/time text in confirmations and lists.
+Aim: Verify that `deadline` parses a valid date and time and displays it as `MMM dd yyyy HH:mm`.
 
 Input:
 
 ```text
 todo read book
-deadline submit report /by 11/10/2019 5pm
+deadline submit report /by 2019-10-11 17:00
 list
 bye
 ```
@@ -259,13 +298,13 @@ Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] submit report (by: 11/10/2019 5pm)
+  [D][ ] submit report (by: Oct 11 2019 17:00)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
 1.[T][ ] read book
-2.[D][ ] submit report (by: 11/10/2019 5pm)
+2.[D][ ] submit report (by: Oct 11 2019 17:00)
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
@@ -274,13 +313,13 @@ ____________________________________________________________
 
 ## Test Case: Add events with start and end values
 
-Aim: Verify that `event` creates Event tasks and preserves both supplied date/time values in confirmations and lists.
+Aim: Verify that `event` parses valid endpoints and displays each as `MMM dd yyyy HH:mm`.
 
 Input:
 
 ```text
-event team project meeting /from 2/10/2019 2pm /to 4pm
-event orientation week /from 4/10/2019 /to 11/10/2019
+event team project meeting /from 2019-10-02 14:00 /to 2019-10-02 16:00
+event orientation week /from 2019-10-04 09:00 /to 2019-10-11 17:00
 list
 bye
 ```
@@ -299,18 +338,96 @@ Hello! I'm Panda.
 What can I do for you?
 ____________________________________________________________
 Got it. I've added this task:
-  [E][ ] team project meeting (from: 2/10/2019 2pm to: 4pm)
+  [E][ ] team project meeting (from: Oct 02 2019 14:00 to: Oct 02 2019 16:00)
 Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [E][ ] orientation week (from: 4/10/2019 to: 11/10/2019)
+  [E][ ] orientation week (from: Oct 04 2019 09:00 to: Oct 11 2019 17:00)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
-1.[E][ ] team project meeting (from: 2/10/2019 2pm to: 4pm)
-2.[E][ ] orientation week (from: 4/10/2019 to: 11/10/2019)
+1.[E][ ] team project meeting (from: Oct 02 2019 14:00 to: Oct 02 2019 16:00)
+2.[E][ ] orientation week (from: Oct 04 2019 09:00 to: Oct 11 2019 17:00)
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Reject invalid list dates
+
+Aim: Verify that `list` rejects malformed and impossible filter dates through InvalidDateException.
+
+Input:
+
+```text
+list 2025/02/28
+list 2025-02-29
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+OOPS!!! This panda needs a valid list date in yyyy-MM-dd format.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid list date in yyyy-MM-dd format.
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Reject invalid deadline and event dates
+
+Aim: Verify that impossible or malformed deadline, event-start, and event-end values report InvalidDateException and do not add tasks.
+
+Input:
+
+```text
+deadline leap-day report /by 2025-02-29 12:00
+event bad start /from tomorrow /to 2026-08-26 16:00
+event bad end /from 2026-08-26 14:00 /to 2025-02-29 16:00
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
@@ -350,13 +467,13 @@ ____________________________________________________________
 
 ## Test Case: Reject unsupported command messages
 
-Aim: Verify that the Command enum rejects unknown keywords and arguments supplied to argument-free commands.
+Aim: Verify that the Command enum rejects unknown keywords and arguments supplied to the argument-free `bye` command.
 
 Input:
 
 ```text
 blah
-list extra
+unknown extra
 bye extra
 bye
 ```
@@ -512,7 +629,7 @@ Input:
 
 ```text
 todo read book
-event project meeting /from Aug 6th 2pm /to 4pm
+event project meeting /from 2019-08-06 14:00 /to 2019-08-06 16:00
 todo borrow book
 delete 2
 list
@@ -538,7 +655,7 @@ Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+  [E][ ] project meeting (from: Aug 06 2019 14:00 to: Aug 06 2019 16:00)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -548,7 +665,7 @@ Now you have 3 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Noted. I've removed this task:
-  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+  [E][ ] project meeting (from: Aug 06 2019 14:00 to: Aug 06 2019 16:00)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
@@ -571,8 +688,8 @@ Input:
 
 ```text
 todo buy bread | milk
-deadline return book /by June 6th
-event project meeting /from Aug 6th 2pm /to 4pm
+deadline return book /by 2019-06-06 18:00
+event project meeting /from 2019-08-06 14:00 /to 2019-08-06 16:00
 mark 1
 bye
 ```
@@ -596,12 +713,12 @@ Now you have 1 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [D][ ] return book (by: June 6th)
+  [D][ ] return book (by: Jun 06 2019 18:00)
 Now you have 2 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
-  [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+  [E][ ] project meeting (from: Aug 06 2019 14:00 to: Aug 06 2019 16:00)
 Now you have 3 tasks in the list.
 ____________________________________________________________
 ____________________________________________________________

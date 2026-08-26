@@ -1,21 +1,25 @@
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 /**
  * Represents a task that must be completed by a stated date or time.
  *
- * Written by Codex: Store the deadline text without parsing it while inheriting
- * the task name, completion status, and mark/unmark behavior from Task.
+ * The deadline is parsed when the task is created, ensuring that every stored
+ * deadline has a valid date and time.
  */
 public class Deadline extends Task {
-    private final String by;
+    private final LocalDateTime by;
 
     /**
      * Creates an unfinished deadline task.
      *
      * @param name the task description
-     * @param by the date or time text supplied by the user
+     * @param by the date and time text supplied by the user
+     * @throws InvalidDateException if {@code by} is not a valid date and time
      */
-    public Deadline(String name, String by) {
+    public Deadline(String name, String by) throws InvalidDateException {
         super(name);
-        this.by = by;
+        this.by = processDate(by);
     }
 
     /**
@@ -29,13 +33,24 @@ public class Deadline extends Task {
     }
 
     /**
-     * Returns the task description together with its unmodified deadline text.
+     * Returns the task description together with its formatted deadline.
      *
      * @return the formatted deadline description
      */
     @Override
     public String getDisplayText() {
-        return getName() + " (by: " + by + ")";
+        return getName() + " (by: " + formatDateForDisplay(by) + ")";
+    }
+
+    /**
+     * Checks whether this deadline is due on the supplied date.
+     *
+     * @param date the date used to filter the task list
+     * @return true when the deadline falls on {@code date}
+     */
+    @Override
+    public boolean occursOn(LocalDate date) {
+        return by.toLocalDate().equals(date);
     }
 
     /**
@@ -45,6 +60,6 @@ public class Deadline extends Task {
      */
     @Override
     public String toDataString() {
-        return super.toDataString() + " | " + escapeDataField(by);
+        return super.toDataString() + " | " + escapeDataField(formatDateForStorage(by));
     }
 }
