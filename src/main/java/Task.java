@@ -1,3 +1,8 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
+
 /**
  * Represents one task in Panda's in-memory task list.
  *
@@ -7,6 +12,9 @@
 public abstract class Task {
     private final String name;
     private boolean done;
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm")
+                    .withResolverStyle(ResolverStyle.STRICT);
 
     /**
      * Creates a new unfinished task with the given name.
@@ -92,5 +100,32 @@ public abstract class Task {
      */
     protected static String escapeDataField(String value) {
         return value.replace("\\", "\\\\").replace("|", "\\|");
+    }
+
+    /**
+     * Parses a date and time using Panda's required input format.
+     * Strict parsing rejects impossible values such as 29 February 2025.
+     *
+     * @param dateTimeText the date and time in {@code uuuu-MM-dd HH:mm} format
+     * @return the parsed date and time
+     * @throws InvalidDateException if the text is malformed or contains an invalid value
+     */
+    protected static LocalDateTime processDate(String dateTimeText)
+            throws InvalidDateException {
+        try {
+            return LocalDateTime.parse(dateTimeText, DATE_TIME_FORMATTER);
+        } catch (DateTimeParseException exception) {
+            throw new InvalidDateException();
+        }
+    }
+
+    /**
+     * Formats a parsed value consistently for display and storage.
+     *
+     * @param dateTime the value to format
+     * @return the value in {@code uuuu-MM-dd HH:mm} format
+     */
+    protected static String formatDate(LocalDateTime dateTime) {
+        return dateTime.format(DATE_TIME_FORMATTER);
     }
 }

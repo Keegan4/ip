@@ -45,7 +45,7 @@ public class Panda {
         ArrayList<Task> tasks = new ArrayList<>();
         // Written by Codex: Allow tests to supply a fixture while retaining the existing default path.
         Path dataFile = args.length > 0 ? Path.of(args[0]) : DEFAULT_DATA_FILE_PATH;
-        ArrayList<DataLoadingException> loadingErrors = new ArrayList<>();
+        ArrayList<PandaException> loadingErrors = new ArrayList<>();
         try {
             loadingErrors = loadTasks(tasks, dataFile);
         } catch (DataLoadingException exception) {
@@ -55,7 +55,7 @@ public class Panda {
         if (!loadingErrors.isEmpty()) {
             // Written by Codex: Prompt the user about every invalid record at the UI boundary.
             System.out.println(divider);
-            for (DataLoadingException loadingError : loadingErrors) {
+            for (PandaException loadingError : loadingErrors) {
                 System.out.println(loadingError.getMessage());
             }
             System.out.println(divider);
@@ -111,7 +111,7 @@ public class Panda {
                     saveTasks(tasks, dataFile);
                 }
                 case EVENT -> {
-                    // Written by Codex: Split event input without validating either date/time value.
+                    // Split event input before its constructor validates both date/time values.
                     String eventDetails = msg.substring(command.getKeyword().length()).trim();
                     ensureDescription(eventDetails, command);
                     // Written by Codex: Treat a leading time marker as a missing event description.
@@ -140,7 +140,7 @@ public class Panda {
                     }
                 }
                 case DEADLINE -> {
-                    // Written by Codex: Split deadline input without validating the date/time text.
+                    // Split deadline input before its constructor validates the date/time value.
                     String deadlineDetails = msg.substring(command.getKeyword().length()).trim();
                     ensureDescription(deadlineDetails, command);
                     // Written by Codex: Treat a leading time marker as a missing deadline description.
@@ -240,9 +240,9 @@ public class Panda {
      * @return the errors for malformed records that were skipped
      * @throws DataLoadingException if the file exists but cannot be read
      */
-    private static ArrayList<DataLoadingException> loadTasks(ArrayList<Task> tasks, Path dataFile)
+    private static ArrayList<PandaException> loadTasks(ArrayList<Task> tasks, Path dataFile)
             throws DataLoadingException {
-        ArrayList<DataLoadingException> loadingErrors = new ArrayList<>();
+        ArrayList<PandaException> loadingErrors = new ArrayList<>();
         if (Files.notExists(dataFile)) {
             // Written by Codex: A first run has no data file and should start with an empty list.
             return loadingErrors;
@@ -260,6 +260,8 @@ public class Panda {
                     } catch (DataLoadingException exception) {
                         // Written by Codex: Record this invalid line for the UI, then continue loading.
                         loadingErrors.add(exception);
+                    } catch (InvalidDateException e) {
+                        loadingErrors.add(e);
                     }
                 }
             }
@@ -282,7 +284,7 @@ public class Panda {
      * @throws DataLoadingException if the record does not follow the storage format
      */
     private static Task parseStoredTask(String line, int lineNumber)
-            throws DataLoadingException {
+            throws DataLoadingException, InvalidDateException {
         String[] fields = splitStoredFields(line);
         if (fields.length < 3 || fields[2].isBlank()) {
             throw new DataLoadingException(lineNumber, "no task description.");
@@ -296,6 +298,7 @@ public class Panda {
         case "D" -> {
             ensureStoredFieldCount(fields, 4, lineNumber, "deadline");
             ensureStoredValue(fields[3], lineNumber, "no deadline time.");
+
             yield new Deadline(fields[2], fields[3]);
         }
         case "E" -> {

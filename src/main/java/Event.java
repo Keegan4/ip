@@ -1,24 +1,27 @@
+import java.time.LocalDateTime;
+
 /**
  * Represents a task with a stated start and end date or time.
  *
- * Written by Codex: Preserve the event's start and end text while inheriting
- * its name, completion status, and mark/unmark behavior from Task.
+ * Both endpoints are parsed when the event is created, ensuring that every
+ * stored event has valid start and end values.
  */
 public class Event extends Task {
-    private final String from;
-    private final String to;
+    private final LocalDateTime from;
+    private final LocalDateTime to;
 
     /**
      * Creates an unfinished event task.
      *
      * @param name the event description
-     * @param from the supplied starting date or time
-     * @param to the supplied ending date or time
+     * @param from the supplied starting date and time
+     * @param to the supplied ending date and time
+     * @throws InvalidDateException if either endpoint is not a valid date and time
      */
-    public Event(String name, String from, String to) {
+    public Event(String name, String from, String to) throws InvalidDateException {
         super(name);
-        this.from = from;
-        this.to = to;
+        this.from = processDate(from);
+        this.to = processDate(to);
     }
 
     /**
@@ -32,13 +35,14 @@ public class Event extends Task {
     }
 
     /**
-     * Returns the event description together with its unmodified time range.
+     * Returns the event description together with its formatted time range.
      *
      * @return the formatted event description
      */
     @Override
     public String getDisplayText() {
-        return getName() + " (from: " + from + " to: " + to + ")";
+        return getName() + " (from: " + formatDate(from)
+                + " to: " + formatDate(to) + ")";
     }
 
     /**
@@ -48,7 +52,7 @@ public class Event extends Task {
      */
     @Override
     public String toDataString() {
-        return super.toDataString() + " | " + escapeDataField(from)
-                + " | " + escapeDataField(to);
+        return super.toDataString() + " | " + escapeDataField(formatDate(from))
+                + " | " + escapeDataField(formatDate(to));
     }
 }
