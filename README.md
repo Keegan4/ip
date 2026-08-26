@@ -15,3 +15,19 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
    In the same dialog, set the **Project language level** field to the `SDK default` option.
 1. After that, locate the `src/main/java/panda/Panda.java` file, right-click it, and choose `Run Panda.main()` (if the code editor is showing compile errors, try restarting the IDE).
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+
+## AI assistance
+
+OpenAI Codex was used as a coding assistant during the development of this project. Its contributions
+included:
+
+- explaining Java date-time parsing, formatting, and validation;
+- helping implement dated deadlines and events, including the `list <date>` filter;
+- suggesting and implementing the `Ui`, `Storage`, `Parser`, and `TaskList` refactoring;
+- reorganizing classes into packages and configuring Gradle;
+- reviewing error handling, Javadocs, and SE-EDU Java coding-standard compliance; and
+- expanding the JUnit and command-line UI test coverage.
+
+AI-assisted changes were checked by compiling with Java 25, running the Gradle JUnit suite, generating
+Javadocs, and running the project's repeatable command-line UI tests. The project author remains
+responsible for reviewing the resulting code and for the final design and implementation decisions.
