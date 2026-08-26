@@ -28,7 +28,7 @@ public class Storage {
     /**
      * Creates a storage service for the supplied file.
      *
-     * @param filePath the task data file path
+     * @param filePath the task data file path.
      */
     public Storage(String filePath) {
         dataFile = Path.of(filePath);
@@ -38,8 +38,8 @@ public class Storage {
      * Loads every valid stored task and records errors for malformed lines.
      * A missing file represents a first run and produces an empty result.
      *
-     * @return the valid tasks and any recoverable record errors
-     * @throws DataLoadingException if the data file cannot be read
+     * @return the valid tasks and any recoverable record errors.
+     * @throws DataLoadingException if the data file cannot be read.
      */
     public LoadResult load() throws DataLoadingException {
         ArrayList<Task> loadedTasks = new ArrayList<>();
@@ -70,8 +70,8 @@ public class Storage {
     /**
      * Rewrites the data file so it exactly matches the supplied task list.
      *
-     * @param tasks the current tasks in display order
-     * @throws DataSavingException if the destination cannot be created or written
+     * @param tasks the current tasks in display order.
+     * @throws DataSavingException if the destination cannot be created or written.
      */
     public void save(List<Task> tasks) throws DataSavingException {
         StringBuilder storedData = new StringBuilder();
@@ -96,11 +96,11 @@ public class Storage {
     /**
      * Converts one pipe-separated data record into its corresponding task.
      *
-     * @param line one complete line from the data file
-     * @param lineNumber the one-based line number used in error messages
-     * @return the task represented by the stored record
-     * @throws DataLoadingException if the record does not follow the storage format
-     * @throws InvalidDateException if a stored date is invalid
+     * @param line one complete line from the data file.
+     * @param lineNumber the one-based line number used in error messages.
+     * @return the task represented by the stored record.
+     * @throws DataLoadingException if the record does not follow the storage format.
+     * @throws InvalidDateException if a stored date is invalid.
      */
     private Task parseStoredTask(String line, int lineNumber)
             throws DataLoadingException, InvalidDateException {
@@ -166,18 +166,18 @@ public class Storage {
     private String[] splitStoredFields(String line) {
         ArrayList<String> fields = new ArrayList<>();
         StringBuilder currentField = new StringBuilder();
-        boolean escaping = false;
+        boolean isEscaping = false;
 
         for (int i = 0; i < line.length(); i++) {
             char character = line.charAt(i);
-            if (escaping) {
+            if (isEscaping) {
                 if (character != '\\' && character != '|') {
                     currentField.append('\\');
                 }
                 currentField.append(character);
-                escaping = false;
+                isEscaping = false;
             } else if (character == '\\') {
-                escaping = true;
+                isEscaping = true;
             } else if (character == '|') {
                 fields.add(currentField.toString().trim());
                 currentField.setLength(0);
@@ -185,7 +185,7 @@ public class Storage {
                 currentField.append(character);
             }
         }
-        if (escaping) {
+        if (isEscaping) {
             currentField.append('\\');
         }
         fields.add(currentField.toString().trim());
@@ -195,8 +195,8 @@ public class Storage {
     /**
      * Groups successfully loaded tasks with recoverable record errors.
      *
-     * @param tasks the valid tasks loaded from the file
-     * @param errors the errors for individual records that were skipped
+     * @param tasks the valid tasks loaded from the file.
+     * @param errors the errors for individual records that were skipped.
      */
     public record LoadResult(List<Task> tasks, List<PandaException> errors) {
         /**

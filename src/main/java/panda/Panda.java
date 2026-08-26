@@ -14,11 +14,11 @@ import panda.ui.Ui;
 /**
  * Runs the Panda task manager's command-line interface.
  *
- * Written by Codex: Coordinates command parsing, task storage, and user-facing output.
+ * Coordinates command parsing, task storage, and user-facing output.
  */
 public class Panda {
     /**
-     * Written by Codex: Build a relative default path from OS-independent components.
+     * Builds a relative default path from OS-independent components.
      */
     private static final Path DEFAULT_DATA_FILE_PATH =
             Path.of("src", "main", "data", "info.txt");
@@ -32,7 +32,7 @@ public class Panda {
     /**
      * Creates Panda with a user interface and storage for the supplied file.
      *
-     * @param filePath the task data file path
+     * @param filePath the task data file path.
      */
     public Panda(String filePath) {
         ui = new Ui();
@@ -55,7 +55,7 @@ public class Panda {
     /**
      * Starts Panda using the default data file or an optional test file.
      *
-     * @param args an optional first argument overriding the data file path
+     * @param args an optional first argument overriding the data file path.
      */
     public static void main(String[] args) {
         String filePath = args.length > 0
@@ -73,15 +73,15 @@ public class Panda {
         if (!loadingErrors.isEmpty()) {
             ui.showLoadingErrors(loadingErrors);
         }
-        // Written by Codex: Treat a closed input stream as a graceful end to the session.
+        // Treat a closed input stream as a graceful end to the session.
         while (ui.hasNextCommand()) {
-            String msg = ui.readCommand();
-            if (parser.isExitCommand(msg)) {
+            String message = ui.readCommand();
+            if (parser.isExitCommand(message)) {
                 break;
             }
             ui.showDivider();
             try {
-                Parser.ParsedCommand parsedCommand = parser.parse(msg);
+                Parser.ParsedCommand parsedCommand = parser.parse(message);
                 switch (parsedCommand.command()) {
                 case LIST -> {
                     ui.showTaskListHeader();
@@ -96,28 +96,28 @@ public class Panda {
                 case MARK -> {
                     Task task = tasks.mark(parsedCommand.taskNumber());
                     ui.showMarked(task);
-                    storage.save(tasks.asList());
+                    storage.save(tasks.getTaskSnapshot());
                 }
                 case UNMARK -> {
                     Task task = tasks.unmark(parsedCommand.taskNumber());
                     ui.showUnmarked(task);
-                    storage.save(tasks.asList());
+                    storage.save(tasks.getTaskSnapshot());
                 }
                 case DELETE -> {
                     Task removedTask = tasks.delete(parsedCommand.taskNumber());
-                    ui.showDeleted(removedTask, tasks.size());
-                    storage.save(tasks.asList());
+                    ui.showDeleted(removedTask, tasks.getTaskCount());
+                    storage.save(tasks.getTaskSnapshot());
                 }
                 case EVENT, DEADLINE, TODO -> {
                     Task task = parsedCommand.task();
                     tasks.add(task);
-                    ui.showAdded(task, tasks.size());
-                    storage.save(tasks.asList());
+                    ui.showAdded(task, tasks.getTaskCount());
+                    storage.save(tasks.getTaskSnapshot());
                 }
                 case BYE -> throw new IllegalStateException("The bye command should exit before dispatch.");
                 }
             } catch (PandaException exception) {
-                // Written by Codex: Show expected input errors and continue accepting commands.
+                // Show expected input errors and continue accepting commands.
                 ui.showError(exception);
             }
             ui.showDivider();

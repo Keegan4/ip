@@ -24,7 +24,7 @@ public class TaskList {
     /**
      * Creates a task list containing tasks loaded from storage.
      *
-     * @param initialTasks the tasks in their stored order
+     * @param initialTasks the tasks in their stored order.
      */
     public TaskList(List<Task> initialTasks) {
         tasks = new ArrayList<>(initialTasks);
@@ -33,7 +33,7 @@ public class TaskList {
     /**
      * Adds a task to the end of the list.
      *
-     * @param task the task to add
+     * @param task the task to add.
      */
     public void add(Task task) {
         tasks.add(task);
@@ -42,9 +42,9 @@ public class TaskList {
     /**
      * Marks the identified task as completed.
      *
-     * @param taskNumber the one-based task number
-     * @return the task that was marked
-     * @throws InvalidTaskNumberException if no task has that number
+     * @param taskNumber the one-based task number.
+     * @return the task that was marked.
+     * @throws InvalidTaskNumberException if no task has that number.
      */
     public Task mark(int taskNumber) throws InvalidTaskNumberException {
         Task task = getTask(taskNumber);
@@ -55,9 +55,9 @@ public class TaskList {
     /**
      * Marks the identified task as unfinished.
      *
-     * @param taskNumber the one-based task number
-     * @return the task that was unmarked
-     * @throws InvalidTaskNumberException if no task has that number
+     * @param taskNumber the one-based task number.
+     * @return the task that was unmarked.
+     * @throws InvalidTaskNumberException if no task has that number.
      */
     public Task unmark(int taskNumber) throws InvalidTaskNumberException {
         Task task = getTask(taskNumber);
@@ -68,9 +68,9 @@ public class TaskList {
     /**
      * Removes the identified task from the list.
      *
-     * @param taskNumber the one-based task number
-     * @return the removed task
-     * @throws InvalidTaskNumberException if no task has that number
+     * @param taskNumber the one-based task number.
+     * @return the removed task.
+     * @throws InvalidTaskNumberException if no task has that number.
      */
     public Task delete(int taskNumber) throws InvalidTaskNumberException {
         validateTaskNumber(taskNumber);
@@ -80,7 +80,7 @@ public class TaskList {
     /**
      * Returns all tasks together with their stable one-based numbers.
      *
-     * @return the numbered tasks in list order
+     * @return the numbered tasks in list order.
      */
     public List<NumberedTask> getTasks() {
         return createNumberedTasks(null);
@@ -90,8 +90,8 @@ public class TaskList {
      * Returns dated tasks that occur on the supplied date.
      * Date-free to-dos are not included.
      *
-     * @param date the date used to filter tasks
-     * @return matching tasks with their numbers from the complete list
+     * @param date the date used to filter tasks.
+     * @return matching tasks with their numbers from the complete list.
      */
     public List<NumberedTask> getTasksOn(LocalDate date) {
         return createNumberedTasks(date);
@@ -100,18 +100,18 @@ public class TaskList {
     /**
      * Returns a read-only snapshot suitable for saving.
      *
-     * @return the tasks in list order
+     * @return the tasks in list order.
      */
-    public List<Task> asList() {
+    public List<Task> getTaskSnapshot() {
         return List.copyOf(tasks);
     }
 
     /**
      * Returns the number of tasks currently stored.
      *
-     * @return the task count
+     * @return the task count.
      */
-    public int size() {
+    public int getTaskCount() {
         return tasks.size();
     }
 
@@ -150,8 +150,8 @@ public class TaskList {
     /**
      * Pairs a task with its one-based position in the complete task list.
      *
-     * @param number the one-based task number
-     * @param task the corresponding task
+     * @param number the one-based task number.
+     * @param task the corresponding task.
      */
     public record NumberedTask(int number, Task task) {
     }

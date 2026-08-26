@@ -5,29 +5,44 @@ import panda.exception.InvalidCommandException;
 /**
  * Represents a command understood by the Panda chatbot.
  *
- * Written by Codex: Keep command keywords and argument rules in one type-safe place.
+ * Keeps command keywords and argument rules in one type-safe place.
  */
 public enum Command {
+    /** Ends the current Panda session. */
     BYE("bye", false),
+
+    /** Displays all tasks or tasks occurring on a supplied date. */
     LIST("list", true),
+
+    /** Marks a task as completed. */
     MARK("mark", true),
+
+    /** Marks a task as unfinished. */
     UNMARK("unmark", true),
+
+    /** Removes a task from the task list. */
     DELETE("delete", true),
+
+    /** Creates an event with start and end values. */
     EVENT("event", true),
+
+    /** Creates a task with a deadline. */
     DEADLINE("deadline", true),
+
+    /** Creates a date-free task. */
     TODO("todo", true);
 
-    /** Written by Codex: Store the exact lowercase word entered by the user. */
+    /** Stores the exact lowercase word entered by the user. */
     private final String keyword;
 
-    /** Written by Codex: Distinguish commands that may contain details after their keyword. */
+    /** Distinguishes commands that may contain details after their keyword. */
     private final boolean acceptsArguments;
 
     /**
      * Creates a command definition.
      *
-     * @param keyword the command word entered by the user
-     * @param acceptsArguments whether text may follow the command word
+     * @param keyword the command word entered by the user.
+     * @param acceptsArguments whether text may follow the command word.
      */
     Command(String keyword, boolean acceptsArguments) {
         this.keyword = keyword;
@@ -39,11 +54,11 @@ public enum Command {
      *
      * The list command may include a date filter, while bye takes no arguments.
      *
-     * @param message the complete user message
-     * @return the matching command
-     * @throws InvalidCommandException if the message does not match a supported command
+     * @param message the complete user message.
+     * @return the matching command.
+     * @throws InvalidCommandException if the message does not match a supported command.
      */
-    public static Command fromMessage(String message) throws InvalidCommandException {
+    public static Command findCommand(String message) throws InvalidCommandException {
         for (Command command : values()) {
             if (command.matches(message)) {
                 return command;
@@ -55,7 +70,7 @@ public enum Command {
     /**
      * Returns the command word entered by the user.
      *
-     * @return the lowercase command keyword
+     * @return the lowercase command keyword.
      */
     public String getKeyword() {
         return keyword;
@@ -64,8 +79,8 @@ public enum Command {
     /**
      * Checks whether a complete message represents this command.
      *
-     * @param message the complete user message
-     * @return true when the message follows this command's argument rule
+     * @param message the complete user message.
+     * @return true when the message follows this command's argument rule.
      */
     public boolean matches(String message) {
         return message.equals(keyword) || acceptsArguments && message.startsWith(keyword + " ");

@@ -18,10 +18,10 @@ public class Event extends Task {
     /**
      * Creates an unfinished event task.
      *
-     * @param name the event description
-     * @param from the supplied starting date and time
-     * @param to the supplied ending date and time
-     * @throws InvalidDateException if either endpoint is not a valid date and time
+     * @param name the event description.
+     * @param from the supplied starting date and time.
+     * @param to the supplied ending date and time.
+     * @throws InvalidDateException if either endpoint is not a valid date and time.
      */
     public Event(String name, String from, String to) throws InvalidDateException {
         super(name);
@@ -32,7 +32,7 @@ public class Event extends Task {
     /**
      * Returns the list marker for an event.
      *
-     * @return the letter E
+     * @return the letter E.
      */
     @Override
     public String getTypeMarker() {
@@ -42,7 +42,7 @@ public class Event extends Task {
     /**
      * Returns the event description together with its formatted time range.
      *
-     * @return the formatted event description
+     * @return the formatted event description.
      */
     @Override
     public String getDisplayText() {
@@ -54,8 +54,8 @@ public class Event extends Task {
      * Checks whether this event is occurring on the supplied date.
      * Both the start and end dates are included in the event's date range.
      *
-     * @param date the date used to filter the task list
-     * @return true when {@code date} falls within the event's date range
+     * @param date the date used to filter the task list.
+     * @return true when {@code date} falls within the event's date range.
      */
     @Override
     public boolean occursOn(LocalDate date) {
@@ -67,7 +67,7 @@ public class Event extends Task {
     /**
      * Converts this event into one line of Panda's storage format.
      *
-     * @return the common task fields followed by the start and end values
+     * @return the common task fields followed by the start and end values.
      */
     @Override
     public String toDataString() {

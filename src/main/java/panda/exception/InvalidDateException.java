@@ -20,7 +20,7 @@ public class InvalidDateException extends PandaException {
     /**
      * Creates an error with a message for a particular date-input context.
      *
-     * @param message the user-facing validation message
+     * @param message the user-facing validation message.
      */
     private InvalidDateException(String message) {
         super(message);
@@ -29,9 +29,9 @@ public class InvalidDateException extends PandaException {
     /**
      * Creates an error for an invalid date supplied to {@code list}.
      *
-     * @return an error explaining the list-date format
+     * @return an error explaining the list-date format.
      */
-    public static InvalidDateException forListDate() {
+    public static InvalidDateException createForListDate() {
         return new InvalidDateException(LIST_DATE_ERROR_MESSAGE);
     }
 }

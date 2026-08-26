@@ -3,7 +3,7 @@ package panda.exception;
 /**
  * Signals that the user entered an unsupported command.
  *
- * Written by Codex: Separate unknown commands from valid commands with bad arguments.
+ * Separates unknown commands from valid commands with bad arguments.
  */
 public class InvalidCommandException extends PandaException {
     /**
