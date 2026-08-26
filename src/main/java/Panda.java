@@ -18,30 +18,33 @@ public class Panda {
     private static final Path DEFAULT_DATA_FILE_PATH =
             Path.of("src", "main", "data", "info.txt");
 
+    private final Ui ui;
+
     /**
-     * Starts the Panda chatbot and displays its greeting and closing messages.
-     *  The ascii art and dividers are created by codex.
+     * Creates the Panda application with its command-line user interface.
+     */
+    public Panda() {
+        ui = new Ui();
+    }
+
+    /**
+     * Starts Panda using the default data file or an optional test file.
+     *
      * @param args an optional first argument overriding the data file path
      */
     public static void main(String[] args) {
-        String divider = "____________________________________________________________";
-        String banner = """
-                 ____    _    _   _ ____    _
-                |  _ \\  / \\  | \\ | |  _ \\  / \\
-                | |_) |/ _ \\ |  \\| | | | |/ _ \\
-                |  __// ___ \\| |\\  | |_| / ___ \\
-                |_|  /_/   \\_\\_| \\_|____/_/   \\_\\
-                """;
+        new Panda().run(args);
+    }
 
-        System.out.println(divider);
-        System.out.println(banner);
-
-        // Introduction
-        System.out.println("Hello! I'm Panda.");
-        System.out.println("What can I do for you?");
+    /**
+     * Loads tasks and runs the command-processing loop.
+     *
+     * @param args an optional first argument overriding the data file path
+     */
+    public void run(String[] args) {
+        ui.showWelcome();
 
         // Main message loop
-        Scanner scanner = new Scanner(System.in);
         // Written by Codex: Let ArrayList grow as tasks are added and manage element removal.
         ArrayList<Task> tasks = new ArrayList<>();
         // Written by Codex: Allow tests to supply a fixture while retaining the existing default path.
@@ -54,20 +57,15 @@ public class Panda {
             loadingErrors.add(exception);
         }
         if (!loadingErrors.isEmpty()) {
-            // Written by Codex: Prompt the user about every invalid record at the UI boundary.
-            System.out.println(divider);
-            for (PandaException loadingError : loadingErrors) {
-                System.out.println(loadingError.getMessage());
-            }
-            System.out.println(divider);
+            ui.showLoadingErrors(loadingErrors);
         }
         // Written by Codex: Treat a closed input stream as a graceful end to the session.
-        while (scanner.hasNextLine()) {
-            String msg = scanner.nextLine();
+        while (ui.hasNextCommand()) {
+            String msg = ui.readCommand();
             if (Command.BYE.matches(msg)) {
                 break;
             }
-            System.out.println(divider);
+            ui.showDivider();
             try {
                 // Written by Codex: Convert the message into a fixed command before dispatching it.
                 Command command = Command.fromMessage(msg);
@@ -76,15 +74,13 @@ public class Panda {
                     String dateText = msg.substring(command.getKeyword().length()).trim();
                     LocalDate filterDate = dateText.isEmpty()
                             ? null : Task.processListDate(dateText);
-                    System.out.println("Here are the tasks in your list:");
+                    ui.showTaskListHeader();
                     for (int i = 0; i < tasks.size(); i++) {
                         Task task = tasks.get(i);
                         if (filterDate != null && !task.occursOn(filterDate)) {
                             continue;
                         }
-                        String status = task.isDone() ? "X" : " ";
-                        System.out.printf("%d.[%s][%s] %s%n", i + 1, task.getTypeMarker(), status,
-                                task.getDisplayText());
+                        ui.showTask(i + 1, task);
                     }
                 }
                 case MARK -> {
@@ -92,8 +88,7 @@ public class Panda {
                     int taskNumber = parseTaskNumber(msg, command, tasks.size());
                     Task task = tasks.get(taskNumber - 1);
                     task.mark();
-                    System.out.println("Nice! I've marked this task as done:");
-                    System.out.printf("  [X] %s%n", task.getName());
+                    ui.showMarked(task);
                     saveTasks(tasks, dataFile);
                 }
                 case UNMARK -> {
@@ -101,19 +96,14 @@ public class Panda {
                     int taskNumber = parseTaskNumber(msg, command, tasks.size());
                     Task task = tasks.get(taskNumber - 1);
                     task.unmark();
-                    System.out.println("OK, I've marked this task as not done yet:");
-                    System.out.printf("  [ ] %s%n", task.getName());
+                    ui.showUnmarked(task);
                     saveTasks(tasks, dataFile);
                 }
                 case DELETE -> {
                     // Written by Codex: Let ArrayList remove the task and close the index gap.
                     int taskNumber = parseTaskNumber(msg, command, tasks.size());
                     Task removedTask = tasks.remove(taskNumber - 1);
-                    String status = removedTask.isDone() ? "X" : " ";
-                    System.out.println("Noted. I've removed this task:");
-                    System.out.printf("  [%s][%s] %s%n", removedTask.getTypeMarker(), status,
-                            removedTask.getDisplayText());
-                    System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
+                    ui.showDeleted(removedTask, tasks.size());
                     saveTasks(tasks, dataFile);
                 }
                 case EVENT -> {
@@ -139,9 +129,7 @@ public class Panda {
                         String to = eventDetails.substring(toIndex + toSeparator.length()).trim();
                         Task task = new Event(taskName, from, to);
                         tasks.add(task);
-                        System.out.println("Got it. I've added this task:");
-                        System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getDisplayText());
-                        System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
+                        ui.showAdded(task, tasks.size());
                         saveTasks(tasks, dataFile);
                     }
                 }
@@ -163,9 +151,7 @@ public class Panda {
                         String by = deadlineDetails.substring(separatorIndex + separator.length()).trim();
                         Task task = new Deadline(taskName, by);
                         tasks.add(task);
-                        System.out.println("Got it. I've added this task:");
-                        System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getDisplayText());
-                        System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
+                        ui.showAdded(task, tasks.size());
                         saveTasks(tasks, dataFile);
                     }
                 }
@@ -175,22 +161,18 @@ public class Panda {
                     ensureDescription(taskName, command);
                     Task task = new Todo(taskName);
                     tasks.add(task);
-                    System.out.println("Got it. I've added this task:");
-                    System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getName());
-                    System.out.printf("Now you have %d tasks in the list.%n", tasks.size());
+                    ui.showAdded(task, tasks.size());
                     saveTasks(tasks, dataFile);
                 }
                 case BYE -> throw new IllegalStateException("The bye command should exit before dispatch.");
                 }
             } catch (PandaException exception) {
                 // Written by Codex: Show expected input errors and continue accepting commands.
-                System.out.println(exception.getMessage());
+                ui.showError(exception);
             }
-            System.out.println(divider);
+            ui.showDivider();
         }
-        System.out.println(divider);
-        System.out.println("Bye. Hope to see you again soon!");
-        System.out.println(divider);
+        ui.showGoodbye();
     }
 
     /**
