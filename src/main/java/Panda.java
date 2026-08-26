@@ -1,5 +1,4 @@
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -14,6 +13,7 @@ public class Panda {
     private static final Path DEFAULT_DATA_FILE_PATH =
             Path.of("src", "main", "data", "info.txt");
 
+    private final Parser parser;
     private final Storage storage;
     private final TaskList tasks;
     private final Ui ui;
@@ -26,6 +26,7 @@ public class Panda {
      */
     public Panda(String filePath) {
         ui = new Ui();
+        parser = new Parser();
         storage = new Storage(filePath);
         TaskList loadedTasks;
         List<PandaException> errors;
@@ -65,99 +66,40 @@ public class Panda {
         // Written by Codex: Treat a closed input stream as a graceful end to the session.
         while (ui.hasNextCommand()) {
             String msg = ui.readCommand();
-            if (Command.BYE.matches(msg)) {
+            if (parser.isExitCommand(msg)) {
                 break;
             }
             ui.showDivider();
             try {
-                // Written by Codex: Convert the message into a fixed command before dispatching it.
-                Command command = Command.fromMessage(msg);
-                switch (command) {
+                Parser.ParsedCommand parsedCommand = parser.parse(msg);
+                switch (parsedCommand.command()) {
                 case LIST -> {
-                    String dateText = msg.substring(command.getKeyword().length()).trim();
-                    LocalDate filterDate = dateText.isEmpty()
-                            ? null : Task.processListDate(dateText);
                     ui.showTaskListHeader();
-                    List<TaskList.NumberedTask> displayedTasks = filterDate == null
-                            ? tasks.getTasks() : tasks.getTasksOn(filterDate);
+                    List<TaskList.NumberedTask> displayedTasks =
+                            parsedCommand.filterDate() == null
+                                    ? tasks.getTasks()
+                                    : tasks.getTasksOn(parsedCommand.filterDate());
                     for (TaskList.NumberedTask numberedTask : displayedTasks) {
                         ui.showTask(numberedTask.number(), numberedTask.task());
                     }
                 }
                 case MARK -> {
-                    // Written by Codex: Convert invalid mark arguments into a PandaException.
-                    int taskNumber = parseTaskNumber(msg, command);
-                    Task task = tasks.mark(taskNumber);
+                    Task task = tasks.mark(parsedCommand.taskNumber());
                     ui.showMarked(task);
                     storage.save(tasks.asList());
                 }
                 case UNMARK -> {
-                    // Written by Codex: Convert invalid unmark arguments into a PandaException.
-                    int taskNumber = parseTaskNumber(msg, command);
-                    Task task = tasks.unmark(taskNumber);
+                    Task task = tasks.unmark(parsedCommand.taskNumber());
                     ui.showUnmarked(task);
                     storage.save(tasks.asList());
                 }
                 case DELETE -> {
-                    int taskNumber = parseTaskNumber(msg, command);
-                    Task removedTask = tasks.delete(taskNumber);
+                    Task removedTask = tasks.delete(parsedCommand.taskNumber());
                     ui.showDeleted(removedTask, tasks.size());
                     storage.save(tasks.asList());
                 }
-                case EVENT -> {
-                    // Split event input before its constructor validates both date/time values.
-                    String eventDetails = msg.substring(command.getKeyword().length()).trim();
-                    ensureDescription(eventDetails, command);
-                    // Written by Codex: Treat a leading time marker as a missing event description.
-                    if (eventDetails.startsWith("/from ") || eventDetails.startsWith("from ")) {
-                        throw new EmptyDescriptionException(command.getKeyword());
-                    }
-                    String fromSeparator = eventDetails.contains(" /from ") ? " /from " : " from ";
-                    String toSeparator = eventDetails.contains(" /to ") ? " /to " : " to ";
-                    int fromIndex = eventDetails.indexOf(fromSeparator);
-                    int toIndex = eventDetails.indexOf(toSeparator,
-                            fromIndex < 0 ? 0 : fromIndex + fromSeparator.length());
-                    if (fromIndex <= 0 || toIndex <= fromIndex + fromSeparator.length()
-                            || toIndex + toSeparator.length() >= eventDetails.length()) {
-                        throw new MissingDateTimeException(
-                                "event <description> /from <start> /to <end>.");
-                    } else {
-                        String taskName = eventDetails.substring(0, fromIndex).trim();
-                        String from = eventDetails.substring(fromIndex + fromSeparator.length(), toIndex).trim();
-                        String to = eventDetails.substring(toIndex + toSeparator.length()).trim();
-                        Task task = new Event(taskName, from, to);
-                        tasks.add(task);
-                        ui.showAdded(task, tasks.size());
-                        storage.save(tasks.asList());
-                    }
-                }
-                case DEADLINE -> {
-                    // Split deadline input before its constructor validates the date/time value.
-                    String deadlineDetails = msg.substring(command.getKeyword().length()).trim();
-                    ensureDescription(deadlineDetails, command);
-                    // Written by Codex: Treat a leading time marker as a missing deadline description.
-                    if (deadlineDetails.startsWith("/by ") || deadlineDetails.startsWith("by ")) {
-                        throw new EmptyDescriptionException(command.getKeyword());
-                    }
-                    String separator = deadlineDetails.contains(" /by ") ? " /by " : " by ";
-                    int separatorIndex = deadlineDetails.indexOf(separator);
-                    if (separatorIndex <= 0 || separatorIndex + separator.length() >= deadlineDetails.length()) {
-                        throw new MissingDateTimeException(
-                                "deadline <description> /by <date or time>.");
-                    } else {
-                        String taskName = deadlineDetails.substring(0, separatorIndex).trim();
-                        String by = deadlineDetails.substring(separatorIndex + separator.length()).trim();
-                        Task task = new Deadline(taskName, by);
-                        tasks.add(task);
-                        ui.showAdded(task, tasks.size());
-                        storage.save(tasks.asList());
-                    }
-                }
-                case TODO -> {
-                    // Written by Codex: Reject a Todo that has no description to store.
-                    String taskName = msg.substring(command.getKeyword().length()).trim();
-                    ensureDescription(taskName, command);
-                    Task task = new Todo(taskName);
+                case EVENT, DEADLINE, TODO -> {
+                    Task task = parsedCommand.task();
                     tasks.add(task);
                     ui.showAdded(task, tasks.size());
                     storage.save(tasks.asList());
@@ -171,43 +113,5 @@ public class Panda {
             ui.showDivider();
         }
         ui.showGoodbye();
-    }
-
-    /**
-     * Parses and validates the one-based task number used by mark, unmark, and delete.
-     *
-     * Written by Codex: Translate Java number-format failures into a domain-specific error.
-     *
-     * @param message the complete user command
-     * @param command the command being processed
-     * @return the parsed one-based task number
-     * @throws InvalidTaskNumberException if the argument is missing or non-numeric
-     */
-    private static int parseTaskNumber(String message, Command command)
-            throws InvalidTaskNumberException {
-        String taskNumberText = message.substring(command.getKeyword().length()).trim();
-        int taskNumber;
-        try {
-            taskNumber = Integer.parseInt(taskNumberText);
-        } catch (NumberFormatException exception) {
-            throw new InvalidTaskNumberException(command.getKeyword());
-        }
-        return taskNumber;
-    }
-
-    /**
-     * Ensures a task-creation command includes a description.
-     *
-     * Written by Codex: Reuse one validation rule for Todo, Deadline, and Event.
-     *
-     * @param description the parsed task description
-     * @param command the task-creation command being processed
-     * @throws EmptyDescriptionException if the description is blank
-     */
-    private static void ensureDescription(String description, Command command)
-            throws EmptyDescriptionException {
-        if (description.isBlank()) {
-            throw new EmptyDescriptionException(command.getKeyword());
-        }
     }
 }

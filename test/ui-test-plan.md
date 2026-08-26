@@ -2,7 +2,7 @@
 
 ## Configuration
 
-- Setup command: `javac -d build/classes src/main/java/PandaException.java src/main/java/EmptyDescriptionException.java src/main/java/InvalidCommandException.java src/main/java/InvalidTaskNumberException.java src/main/java/MissingDateTimeException.java src/main/java/InvalidDateException.java src/main/java/DataLoadingException.java src/main/java/DataSavingException.java src/main/java/Command.java src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Ui.java src/main/java/Storage.java src/main/java/TaskList.java src/main/java/Panda.java`
+- Setup command: `javac -d build/classes src/main/java/PandaException.java src/main/java/EmptyDescriptionException.java src/main/java/InvalidCommandException.java src/main/java/InvalidTaskNumberException.java src/main/java/MissingDateTimeException.java src/main/java/InvalidDateException.java src/main/java/DataLoadingException.java src/main/java/DataSavingException.java src/main/java/Command.java src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Ui.java src/main/java/Storage.java src/main/java/TaskList.java src/main/java/Parser.java src/main/java/Panda.java`
 - Run command: `python test/run_panda_ui.py`
 - Timeout seconds: `10`
 
