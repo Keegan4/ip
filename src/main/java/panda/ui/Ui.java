@@ -44,7 +44,7 @@ public class Ui {
     /**
      * Reports whether another command is available from the input stream.
      *
-     * @return true when another complete input line can be read
+     * @return true when another complete input line can be read.
      */
     public boolean hasNextCommand() {
         return scanner.hasNextLine();
@@ -53,7 +53,7 @@ public class Ui {
     /**
      * Reads the next command entered by the user.
      *
-     * @return the complete command line
+     * @return the complete command line.
      */
     public String readCommand() {
         return scanner.nextLine();
@@ -62,7 +62,7 @@ public class Ui {
     /**
      * Displays errors found while loading stored tasks.
      *
-     * @param errors the loading errors to present
+     * @param errors the loading errors to present.
      */
     public void showLoadingErrors(List<PandaException> errors) {
         showDivider();
@@ -89,8 +89,8 @@ public class Ui {
     /**
      * Displays one task with its original one-based task number.
      *
-     * @param taskNumber the task's one-based position in the complete list
-     * @param task the task to display
+     * @param taskNumber the task's one-based position in the complete list.
+     * @param task the task to display.
      */
     public void showTask(int taskNumber, Task task) {
         String status = task.isDone() ? "X" : " ";
@@ -101,7 +101,7 @@ public class Ui {
     /**
      * Displays confirmation that a task was marked as done.
      *
-     * @param task the task that was marked
+     * @param task the task that was marked.
      */
     public void showMarked(Task task) {
         System.out.println("Nice! I've marked this task as done:");
@@ -111,7 +111,7 @@ public class Ui {
     /**
      * Displays confirmation that a task was marked as unfinished.
      *
-     * @param task the task that was unmarked
+     * @param task the task that was unmarked.
      */
     public void showUnmarked(Task task) {
         System.out.println("OK, I've marked this task as not done yet:");
@@ -121,8 +121,8 @@ public class Ui {
     /**
      * Displays confirmation that a task was removed.
      *
-     * @param task the removed task
-     * @param remainingTaskCount the number of tasks left in the list
+     * @param task the removed task.
+     * @param remainingTaskCount the number of tasks left in the list.
      */
     public void showDeleted(Task task, int remainingTaskCount) {
         String status = task.isDone() ? "X" : " ";
@@ -135,8 +135,8 @@ public class Ui {
     /**
      * Displays confirmation that a task was added.
      *
-     * @param task the new task
-     * @param taskCount the new total number of tasks
+     * @param task the new task.
+     * @param taskCount the new total number of tasks.
      */
     public void showAdded(Task task, int taskCount) {
         System.out.println("Got it. I've added this task:");
@@ -147,7 +147,7 @@ public class Ui {
     /**
      * Displays an expected user-facing error.
      *
-     * @param exception the expected application error
+     * @param exception the expected application error.
      */
     public void showError(PandaException exception) {
         System.out.println(exception.getMessage());
@@ -165,7 +165,7 @@ public class Ui {
     /**
      * Displays the total task count after a list mutation.
      *
-     * @param taskCount the current number of tasks
+     * @param taskCount the current number of tasks.
      */
     private void showTaskCount(int taskCount) {
         System.out.printf("Now you have %d tasks in the list.%n", taskCount);

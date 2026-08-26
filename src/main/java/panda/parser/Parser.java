@@ -20,10 +20,16 @@ import panda.task.Todo;
  */
 public class Parser {
     /**
+     * Creates a command parser.
+     */
+    public Parser() {
+    }
+
+    /**
      * Checks whether a message is the exact command that ends the program.
      *
-     * @param message the complete user input
-     * @return true only for the argument-free {@code bye} command
+     * @param message the complete user input.
+     * @return true only for the argument-free {@code bye} command.
      */
     public boolean isExitCommand(String message) {
         return Command.BYE.matches(message);
@@ -32,14 +38,14 @@ public class Parser {
     /**
      * Parses one complete user message.
      *
-     * @param message the complete user input
-     * @return a structured command containing its relevant argument
-     * @throws PandaException if the command or any argument is invalid
+     * @param message the complete user input.
+     * @return a structured command containing its relevant argument.
+     * @throws PandaException if the command or any argument is invalid.
      */
     public ParsedCommand parse(String message) throws PandaException {
-        Command command = Command.fromMessage(message);
+        Command command = Command.findCommand(message);
         return switch (command) {
-        case BYE -> ParsedCommand.withoutArgument(command);
+        case BYE -> ParsedCommand.createWithoutArgument(command);
         case LIST -> parseList(message, command);
         case MARK, UNMARK, DELETE -> parseTaskNumber(message, command);
         case TODO -> parseTodo(message, command);
@@ -56,7 +62,7 @@ public class Parser {
         String dateText = getArguments(message, command);
         LocalDate filterDate = dateText.isEmpty()
                 ? null : Task.processListDate(dateText);
-        return ParsedCommand.withFilterDate(command, filterDate);
+        return ParsedCommand.createWithFilterDate(command, filterDate);
     }
 
     /**
@@ -66,7 +72,7 @@ public class Parser {
             throws InvalidTaskNumberException {
         String taskNumberText = getArguments(message, command);
         try {
-            return ParsedCommand.withTaskNumber(command,
+            return ParsedCommand.createWithTaskNumber(command,
                     Integer.parseInt(taskNumberText));
         } catch (NumberFormatException exception) {
             throw new InvalidTaskNumberException(command.getKeyword());
@@ -80,7 +86,7 @@ public class Parser {
             throws EmptyDescriptionException {
         String description = getArguments(message, command);
         ensureDescription(description, command);
-        return ParsedCommand.withTask(command, new Todo(description));
+        return ParsedCommand.createWithTask(command, new Todo(description));
     }
 
     /**
@@ -105,7 +111,7 @@ public class Parser {
 
         String description = details.substring(0, separatorIndex).trim();
         String by = details.substring(separatorIndex + separator.length()).trim();
-        return ParsedCommand.withTask(command, new Deadline(description, by));
+        return ParsedCommand.createWithTask(command, new Deadline(description, by));
     }
 
     /**
@@ -134,7 +140,7 @@ public class Parser {
         String description = details.substring(0, fromIndex).trim();
         String from = details.substring(fromIndex + fromSeparator.length(), toIndex).trim();
         String to = details.substring(toIndex + toSeparator.length()).trim();
-        return ParsedCommand.withTask(command, new Event(description, from, to));
+        return ParsedCommand.createWithTask(command, new Event(description, from, to));
     }
 
     /**
@@ -159,38 +165,38 @@ public class Parser {
      * Fields that do not apply to a particular command are null; the factory
      * methods keep those combinations consistent inside the parser.
      *
-     * @param command the recognized command type
-     * @param task a parsed task for task-creation commands
-     * @param taskNumber a number for mark, unmark, or delete
-     * @param filterDate an optional date supplied to list
+     * @param command the recognized command type.
+     * @param task a parsed task for task-creation commands.
+     * @param taskNumber a number for mark, unmark, or delete.
+     * @param filterDate an optional date supplied to list.
      */
     public record ParsedCommand(Command command, Task task, Integer taskNumber,
             LocalDate filterDate) {
         /**
          * Creates a parsed command without an argument.
          */
-        private static ParsedCommand withoutArgument(Command command) {
+        private static ParsedCommand createWithoutArgument(Command command) {
             return new ParsedCommand(command, null, null, null);
         }
 
         /**
          * Creates a parsed task-creation command.
          */
-        private static ParsedCommand withTask(Command command, Task task) {
+        private static ParsedCommand createWithTask(Command command, Task task) {
             return new ParsedCommand(command, task, null, null);
         }
 
         /**
          * Creates a parsed numbered command.
          */
-        private static ParsedCommand withTaskNumber(Command command, int taskNumber) {
+        private static ParsedCommand createWithTaskNumber(Command command, int taskNumber) {
             return new ParsedCommand(command, null, taskNumber, null);
         }
 
         /**
          * Creates a parsed list command with an optional date filter.
          */
-        private static ParsedCommand withFilterDate(Command command, LocalDate filterDate) {
+        private static ParsedCommand createWithFilterDate(Command command, LocalDate filterDate) {
             return new ParsedCommand(command, null, null, filterDate);
         }
     }

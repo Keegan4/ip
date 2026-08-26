@@ -17,9 +17,9 @@ public class Deadline extends Task {
     /**
      * Creates an unfinished deadline task.
      *
-     * @param name the task description
-     * @param by the date and time text supplied by the user
-     * @throws InvalidDateException if {@code by} is not a valid date and time
+     * @param name the task description.
+     * @param by the date and time text supplied by the user.
+     * @throws InvalidDateException if {@code by} is not a valid date and time.
      */
     public Deadline(String name, String by) throws InvalidDateException {
         super(name);
@@ -29,7 +29,7 @@ public class Deadline extends Task {
     /**
      * Returns the list marker for a deadline.
      *
-     * @return the letter D
+     * @return the letter D.
      */
     @Override
     public String getTypeMarker() {
@@ -39,7 +39,7 @@ public class Deadline extends Task {
     /**
      * Returns the task description together with its formatted deadline.
      *
-     * @return the formatted deadline description
+     * @return the formatted deadline description.
      */
     @Override
     public String getDisplayText() {
@@ -49,8 +49,8 @@ public class Deadline extends Task {
     /**
      * Checks whether this deadline is due on the supplied date.
      *
-     * @param date the date used to filter the task list
-     * @return true when the deadline falls on {@code date}
+     * @param date the date used to filter the task list.
+     * @return true when the deadline falls on {@code date}.
      */
     @Override
     public boolean occursOn(LocalDate date) {
@@ -60,7 +60,7 @@ public class Deadline extends Task {
     /**
      * Converts this deadline into one line of Panda's storage format.
      *
-     * @return the common task fields followed by the deadline value
+     * @return the common task fields followed by the deadline value.
      */
     @Override
     public String toDataString() {

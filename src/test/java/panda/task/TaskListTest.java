@@ -1,5 +1,9 @@
 package panda.task;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -7,10 +11,6 @@ import org.junit.jupiter.api.Test;
 
 import panda.exception.InvalidDateException;
 import panda.exception.InvalidTaskNumberException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests task-list operations that depend on one-based numbering and dates.
@@ -59,7 +59,7 @@ class TaskListTest {
         Task deleted = tasks.delete(1);
 
         assertSame(first, deleted);
-        assertEquals(List.of(second), tasks.asList());
+        assertEquals(List.of(second), tasks.getTaskSnapshot());
     }
 
     @Test
