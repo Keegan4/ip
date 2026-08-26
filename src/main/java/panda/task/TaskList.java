@@ -3,6 +3,7 @@ package panda.task;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import panda.exception.InvalidTaskNumberException;
 
@@ -95,6 +96,26 @@ public class TaskList {
      */
     public List<NumberedTask> getTasksOn(LocalDate date) {
         return createNumberedTasks(date);
+    }
+
+    /**
+     * Returns tasks whose names contain the supplied search term.
+     * Matching ignores letter case and preserves numbers from the complete list.
+     *
+     * @param searchTerm the text to find in task names
+     * @return matching tasks with their original one-based numbers
+     */
+    public List<NumberedTask> getTasksMatching(String searchTerm) {
+        String normalizedSearchTerm = searchTerm.toLowerCase(Locale.ROOT);
+        ArrayList<NumberedTask> matchingTasks = new ArrayList<>();
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            String normalizedTaskName = task.getName().toLowerCase(Locale.ROOT);
+            if (normalizedTaskName.contains(normalizedSearchTerm)) {
+                matchingTasks.add(new NumberedTask(i + 1, task));
+            }
+        }
+        return List.copyOf(matchingTasks);
     }
 
     /**

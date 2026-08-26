@@ -50,6 +50,28 @@ class TaskListTest {
     }
 
     @Test
+    void getTasksMatching_mixedCaseSubstring_returnsMatchesWithOriginalNumbers()
+            throws InvalidDateException {
+        Todo first = new Todo("Read Book");
+        Todo nonMatch = new Todo("buy groceries");
+        Deadline deadline = new Deadline("return book", "2026-09-13 10:00");
+        Event event = new Event("book club meeting", "2026-09-14 14:00",
+                "2026-09-14 16:00");
+        TaskList tasks = new TaskList(List.of(first, nonMatch, deadline, event));
+
+        List<TaskList.NumberedTask> result = tasks.getTasksMatching("BOOK");
+
+        assertEquals(3, result.size());
+        assertEquals(1, result.get(0).number());
+        assertSame(first, result.get(0).task());
+        assertEquals(3, result.get(1).number());
+        assertSame(deadline, result.get(1).task());
+        assertEquals(4, result.get(2).number());
+        assertSame(event, result.get(2).task());
+        assertEquals(0, tasks.getTasksMatching("homework").size());
+    }
+
+    @Test
     void delete_validTaskNumber_removesAndReturnsTheSelectedTask()
             throws InvalidTaskNumberException {
         Todo first = new Todo("read book");

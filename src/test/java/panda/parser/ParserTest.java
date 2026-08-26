@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 import panda.exception.EmptyDescriptionException;
+import panda.exception.EmptySearchTermException;
 import panda.exception.InvalidCommandException;
 import panda.exception.InvalidDateException;
 import panda.exception.InvalidTaskNumberException;
@@ -62,6 +63,17 @@ class ParserTest {
     }
 
     @Test
+    void parse_findCommand_returnsCompleteSearchTerm() throws PandaException {
+        Parser.ParsedCommand result = parser.parse("find Java book");
+
+        assertEquals(Command.FIND, result.command());
+        assertEquals("Java book", result.searchTerm());
+        assertNull(result.task());
+        assertNull(result.taskNumber());
+        assertNull(result.filterDate());
+    }
+
+    @Test
     void parse_datedTaskCommands_returnsCorrectTaskTypesAndDetails()
             throws PandaException {
         Parser.ParsedCommand deadlineResult = parser.parse(
@@ -84,6 +96,7 @@ class ParserTest {
     @Test
     void parse_missingOrMalformedArguments_throwsFocusedExceptions() {
         assertThrows(EmptyDescriptionException.class, () -> parser.parse("todo"));
+        assertThrows(EmptySearchTermException.class, () -> parser.parse("find"));
         assertThrows(InvalidTaskNumberException.class, () -> parser.parse("mark bamboo"));
         assertThrows(InvalidDateException.class, () -> parser.parse("list 2025-02-29"));
         assertThrows(MissingDateTimeException.class,

@@ -87,6 +87,13 @@ public class Ui {
     }
 
     /**
+     * Displays the heading used for task-name search results.
+     */
+    public void showMatchingTaskListHeader() {
+        System.out.println("Here are the matching tasks in your list:");
+    }
+
+    /**
      * Displays one task with its original one-based task number.
      *
      * @param taskNumber the task's one-based position in the complete list.

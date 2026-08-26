@@ -93,6 +93,14 @@ public class Panda {
                         ui.showTask(numberedTask.number(), numberedTask.task());
                     }
                 }
+                case FIND -> {
+                    ui.showMatchingTaskListHeader();
+                    List<TaskList.NumberedTask> matchingTasks =
+                            tasks.getTasksMatching(parsedCommand.searchTerm());
+                    for (TaskList.NumberedTask numberedTask : matchingTasks) {
+                        ui.showTask(numberedTask.number(), numberedTask.task());
+                    }
+                }
                 case MARK -> {
                     Task task = tasks.mark(parsedCommand.taskNumber());
                     ui.showMarked(task);

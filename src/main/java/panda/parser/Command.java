@@ -14,6 +14,9 @@ public enum Command {
     /** Displays all tasks or tasks occurring on a supplied date. */
     LIST("list", true),
 
+    /** Finds task that matches a key word */
+    FIND("find", true),
+
     /** Marks a task as completed. */
     MARK("mark", true),
 
