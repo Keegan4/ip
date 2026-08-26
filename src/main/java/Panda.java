@@ -1,6 +1,6 @@
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Runs the Panda task manager's command-line interface.
@@ -15,7 +15,9 @@ public class Panda {
             Path.of("src", "main", "data", "info.txt");
 
     private final Storage storage;
+    private final TaskList tasks;
     private final Ui ui;
+    private final List<PandaException> loadingErrors;
 
     /**
      * Creates Panda with a user interface and storage for the supplied file.
@@ -25,6 +27,18 @@ public class Panda {
     public Panda(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
+        TaskList loadedTasks;
+        List<PandaException> errors;
+        try {
+            Storage.LoadResult loadResult = storage.load();
+            loadedTasks = new TaskList(loadResult.tasks());
+            errors = loadResult.errors();
+        } catch (DataLoadingException exception) {
+            loadedTasks = new TaskList();
+            errors = List.of(exception);
+        }
+        tasks = loadedTasks;
+        loadingErrors = errors;
     }
 
     /**
@@ -45,18 +59,6 @@ public class Panda {
     public void run() {
         ui.showWelcome();
 
-        // Main message loop
-        // Written by Codex: Let ArrayList grow as tasks are added and manage element removal.
-        ArrayList<Task> tasks = new ArrayList<>();
-        ArrayList<PandaException> loadingErrors = new ArrayList<>();
-        try {
-            Storage.LoadResult loadResult = storage.load();
-            tasks.addAll(loadResult.tasks());
-            loadingErrors.addAll(loadResult.errors());
-        } catch (DataLoadingException exception) {
-            // Written by Codex: Treat a file-access failure as a startup loading error.
-            loadingErrors.add(exception);
-        }
         if (!loadingErrors.isEmpty()) {
             ui.showLoadingErrors(loadingErrors);
         }
@@ -76,36 +78,31 @@ public class Panda {
                     LocalDate filterDate = dateText.isEmpty()
                             ? null : Task.processListDate(dateText);
                     ui.showTaskListHeader();
-                    for (int i = 0; i < tasks.size(); i++) {
-                        Task task = tasks.get(i);
-                        if (filterDate != null && !task.occursOn(filterDate)) {
-                            continue;
-                        }
-                        ui.showTask(i + 1, task);
+                    List<TaskList.NumberedTask> displayedTasks = filterDate == null
+                            ? tasks.getTasks() : tasks.getTasksOn(filterDate);
+                    for (TaskList.NumberedTask numberedTask : displayedTasks) {
+                        ui.showTask(numberedTask.number(), numberedTask.task());
                     }
                 }
                 case MARK -> {
                     // Written by Codex: Convert invalid mark arguments into a PandaException.
-                    int taskNumber = parseTaskNumber(msg, command, tasks.size());
-                    Task task = tasks.get(taskNumber - 1);
-                    task.mark();
+                    int taskNumber = parseTaskNumber(msg, command);
+                    Task task = tasks.mark(taskNumber);
                     ui.showMarked(task);
-                    storage.save(tasks);
+                    storage.save(tasks.asList());
                 }
                 case UNMARK -> {
                     // Written by Codex: Convert invalid unmark arguments into a PandaException.
-                    int taskNumber = parseTaskNumber(msg, command, tasks.size());
-                    Task task = tasks.get(taskNumber - 1);
-                    task.unmark();
+                    int taskNumber = parseTaskNumber(msg, command);
+                    Task task = tasks.unmark(taskNumber);
                     ui.showUnmarked(task);
-                    storage.save(tasks);
+                    storage.save(tasks.asList());
                 }
                 case DELETE -> {
-                    // Written by Codex: Let ArrayList remove the task and close the index gap.
-                    int taskNumber = parseTaskNumber(msg, command, tasks.size());
-                    Task removedTask = tasks.remove(taskNumber - 1);
+                    int taskNumber = parseTaskNumber(msg, command);
+                    Task removedTask = tasks.delete(taskNumber);
                     ui.showDeleted(removedTask, tasks.size());
-                    storage.save(tasks);
+                    storage.save(tasks.asList());
                 }
                 case EVENT -> {
                     // Split event input before its constructor validates both date/time values.
@@ -131,7 +128,7 @@ public class Panda {
                         Task task = new Event(taskName, from, to);
                         tasks.add(task);
                         ui.showAdded(task, tasks.size());
-                        storage.save(tasks);
+                        storage.save(tasks.asList());
                     }
                 }
                 case DEADLINE -> {
@@ -153,7 +150,7 @@ public class Panda {
                         Task task = new Deadline(taskName, by);
                         tasks.add(task);
                         ui.showAdded(task, tasks.size());
-                        storage.save(tasks);
+                        storage.save(tasks.asList());
                     }
                 }
                 case TODO -> {
@@ -163,7 +160,7 @@ public class Panda {
                     Task task = new Todo(taskName);
                     tasks.add(task);
                     ui.showAdded(task, tasks.size());
-                    storage.save(tasks);
+                    storage.save(tasks.asList());
                 }
                 case BYE -> throw new IllegalStateException("The bye command should exit before dispatch.");
                 }
@@ -183,11 +180,10 @@ public class Panda {
      *
      * @param message the complete user command
      * @param command the command being processed
-     * @param taskListSize the number of tasks currently stored
-     * @return the valid one-based task number
-     * @throws InvalidTaskNumberException if the argument is missing, non-numeric, or out of range
+     * @return the parsed one-based task number
+     * @throws InvalidTaskNumberException if the argument is missing or non-numeric
      */
-    private static int parseTaskNumber(String message, Command command, int taskListSize)
+    private static int parseTaskNumber(String message, Command command)
             throws InvalidTaskNumberException {
         String taskNumberText = message.substring(command.getKeyword().length()).trim();
         int taskNumber;
@@ -195,9 +191,6 @@ public class Panda {
             taskNumber = Integer.parseInt(taskNumberText);
         } catch (NumberFormatException exception) {
             throw new InvalidTaskNumberException(command.getKeyword());
-        }
-        if (taskNumber < 1 || taskNumber > taskListSize) {
-            throw new InvalidTaskNumberException(taskNumber);
         }
         return taskNumber;
     }
