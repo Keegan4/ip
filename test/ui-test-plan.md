@@ -2,7 +2,7 @@
 
 ## Configuration
 
-- Setup command: `javac -d build/classes src/main/java/PandaException.java src/main/java/EmptyDescriptionException.java src/main/java/InvalidCommandException.java src/main/java/InvalidTaskNumberException.java src/main/java/MissingDateTimeException.java src/main/java/InvalidDateException.java src/main/java/DataLoadingException.java src/main/java/DataSavingException.java src/main/java/Command.java src/main/java/Task.java src/main/java/Todo.java src/main/java/Deadline.java src/main/java/Event.java src/main/java/Ui.java src/main/java/Storage.java src/main/java/TaskList.java src/main/java/Parser.java src/main/java/Panda.java`
+- Setup command: `javac -d build/classes src/main/java/panda/exception/PandaException.java src/main/java/panda/exception/EmptyDescriptionException.java src/main/java/panda/exception/InvalidCommandException.java src/main/java/panda/exception/InvalidTaskNumberException.java src/main/java/panda/exception/MissingDateTimeException.java src/main/java/panda/exception/InvalidDateException.java src/main/java/panda/exception/DataLoadingException.java src/main/java/panda/exception/DataSavingException.java src/main/java/panda/parser/Command.java src/main/java/panda/task/Task.java src/main/java/panda/task/Todo.java src/main/java/panda/task/Deadline.java src/main/java/panda/task/Event.java src/main/java/panda/ui/Ui.java src/main/java/panda/storage/Storage.java src/main/java/panda/task/TaskList.java src/main/java/panda/parser/Parser.java src/main/java/panda/Panda.java`
 - Run command: `python test/run_panda_ui.py`
 - Timeout seconds: `10`
 

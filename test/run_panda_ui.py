@@ -49,7 +49,7 @@ def main() -> int:
             shutil.copyfile(args.fixture, data_path)
 
         result = subprocess.run(
-            ["java", "-cp", "build/classes", "Panda", str(data_path)],
+            ["java", "-cp", "build/classes", "panda.Panda", str(data_path)],
             input=sys.stdin.read(),
             text=True,
             capture_output=True,
