@@ -1,3 +1,5 @@
+package panda.exception;
+
 /**
  * Signals that the user entered an unsupported command.
  *

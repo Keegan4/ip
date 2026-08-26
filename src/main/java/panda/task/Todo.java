@@ -1,3 +1,5 @@
+package panda.task;
+
 /**
  * Represents a task with no date or time attached.
  *

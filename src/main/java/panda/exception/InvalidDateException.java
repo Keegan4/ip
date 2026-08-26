@@ -1,3 +1,5 @@
+package panda.exception;
+
 /**
  * Signals that a supplied date and time is invalid or incorrectly formatted.
  */

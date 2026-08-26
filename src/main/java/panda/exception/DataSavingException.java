@@ -1,3 +1,5 @@
+package panda.exception;
+
 import java.io.IOException;
 
 /**

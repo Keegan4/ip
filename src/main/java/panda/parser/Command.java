@@ -1,3 +1,7 @@
+package panda.parser;
+
+import panda.exception.InvalidCommandException;
+
 /**
  * Represents a command understood by the Panda chatbot.
  *

@@ -1,3 +1,5 @@
+package panda.exception;
+
 /**
  * Signals that a mark, unmark, or delete command does not identify an existing task.
  *

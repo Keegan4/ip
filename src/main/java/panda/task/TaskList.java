@@ -1,6 +1,10 @@
+package panda.task;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import panda.exception.InvalidTaskNumberException;
 
 /**
  * Owns Panda's ordered collection of tasks and all operations on that list.

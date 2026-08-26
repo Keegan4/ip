@@ -1,3 +1,5 @@
+package panda.exception;
+
 /**
  * Signals that Panda could not safely load its stored task data.
  *

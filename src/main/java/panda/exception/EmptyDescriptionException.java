@@ -1,3 +1,5 @@
+package panda.exception;
+
 /**
  * Signals that a task-creation command has no description.
  *

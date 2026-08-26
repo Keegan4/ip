@@ -1,3 +1,5 @@
+package panda.exception;
+
 /**
  * Base type for user-facing command errors in Panda.
  *

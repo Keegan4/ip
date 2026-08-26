@@ -1,3 +1,5 @@
+package panda.exception;
+
 /**
  * Signals that a deadline or event is missing required timing information.
  *
