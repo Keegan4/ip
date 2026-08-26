@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -72,10 +73,15 @@ public class Panda {
                 Command command = Command.fromMessage(msg);
                 switch (command) {
                 case LIST -> {
-                    // Written by Codex: Show every task with its current completion marker.
+                    String dateText = msg.substring(command.getKeyword().length()).trim();
+                    LocalDate filterDate = dateText.isEmpty()
+                            ? null : Task.processListDate(dateText);
                     System.out.println("Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
                         Task task = tasks.get(i);
+                        if (filterDate != null && !task.occursOn(filterDate)) {
+                            continue;
+                        }
                         String status = task.isDone() ? "X" : " ";
                         System.out.printf("%d.[%s][%s] %s%n", i + 1, task.getTypeMarker(), status,
                                 task.getDisplayText());

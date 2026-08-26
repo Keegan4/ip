@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -38,7 +39,18 @@ public class Deadline extends Task {
      */
     @Override
     public String getDisplayText() {
-        return getName() + " (by: " + formatDate(by) + ")";
+        return getName() + " (by: " + formatDateForDisplay(by) + ")";
+    }
+
+    /**
+     * Checks whether this deadline is due on the supplied date.
+     *
+     * @param date the date used to filter the task list
+     * @return true when the deadline falls on {@code date}
+     */
+    @Override
+    public boolean occursOn(LocalDate date) {
+        return by.toLocalDate().equals(date);
     }
 
     /**
@@ -48,6 +60,6 @@ public class Deadline extends Task {
      */
     @Override
     public String toDataString() {
-        return super.toDataString() + " | " + escapeDataField(formatDate(by));
+        return super.toDataString() + " | " + escapeDataField(formatDateForStorage(by));
     }
 }

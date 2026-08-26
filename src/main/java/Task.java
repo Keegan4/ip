@@ -1,7 +1,9 @@
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.Locale;
 
 /**
  * Represents one task in Panda's in-memory task list.
@@ -12,9 +14,14 @@ import java.time.format.ResolverStyle;
 public abstract class Task {
     private final String name;
     private boolean done;
-    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+    private static final DateTimeFormatter INPUT_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm")
                     .withResolverStyle(ResolverStyle.STRICT);
+    private static final DateTimeFormatter INPUT_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("uuuu-MM-dd")
+                    .withResolverStyle(ResolverStyle.STRICT);
+    private static final DateTimeFormatter DISPLAY_DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("MMM dd uuuu HH:mm", Locale.ENGLISH);
 
     /**
      * Creates a new unfinished task with the given name.
@@ -80,6 +87,17 @@ public abstract class Task {
     }
 
     /**
+     * Reports whether this task occurs on the supplied date.
+     * Date-free task types return false unless a subclass overrides this method.
+     *
+     * @param date the date used to filter the task list
+     * @return true when this task occurs on {@code date}
+     */
+    public boolean occursOn(LocalDate date) {
+        return false;
+    }
+
+    /**
      * Converts this task into one line of Panda's storage format.
      *
      * Written by Codex: Store the common task type, status, and description
@@ -113,19 +131,45 @@ public abstract class Task {
     protected static LocalDateTime processDate(String dateTimeText)
             throws InvalidDateException {
         try {
-            return LocalDateTime.parse(dateTimeText, DATE_TIME_FORMATTER);
+            return LocalDateTime.parse(dateTimeText, INPUT_DATE_TIME_FORMATTER);
         } catch (DateTimeParseException exception) {
             throw new InvalidDateException();
         }
     }
 
     /**
-     * Formats a parsed value consistently for display and storage.
+     * Parses the optional date supplied to the list command.
+     *
+     * @param dateText the date in {@code uuuu-MM-dd} format
+     * @return the parsed date
+     * @throws InvalidDateException if the date is malformed or impossible
+     */
+    public static LocalDate processListDate(String dateText)
+            throws InvalidDateException {
+        try {
+            return LocalDate.parse(dateText, INPUT_DATE_FORMATTER);
+        } catch (DateTimeParseException exception) {
+            throw InvalidDateException.forListDate();
+        }
+    }
+
+    /**
+     * Formats a parsed value for confirmations and task lists.
+     *
+     * @param dateTime the value to format
+     * @return the value in {@code MMM dd uuuu HH:mm} format
+     */
+    protected static String formatDateForDisplay(LocalDateTime dateTime) {
+        return dateTime.format(DISPLAY_DATE_TIME_FORMATTER);
+    }
+
+    /**
+     * Formats a parsed value in Panda's unambiguous storage format.
      *
      * @param dateTime the value to format
      * @return the value in {@code uuuu-MM-dd HH:mm} format
      */
-    protected static String formatDate(LocalDateTime dateTime) {
-        return dateTime.format(DATE_TIME_FORMATTER);
+    protected static String formatDateForStorage(LocalDateTime dateTime) {
+        return dateTime.format(INPUT_DATE_TIME_FORMATTER);
     }
 }

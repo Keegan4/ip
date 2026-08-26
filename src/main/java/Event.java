@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -41,8 +42,22 @@ public class Event extends Task {
      */
     @Override
     public String getDisplayText() {
-        return getName() + " (from: " + formatDate(from)
-                + " to: " + formatDate(to) + ")";
+        return getName() + " (from: " + formatDateForDisplay(from)
+                + " to: " + formatDateForDisplay(to) + ")";
+    }
+
+    /**
+     * Checks whether this event is occurring on the supplied date.
+     * Both the start and end dates are included in the event's date range.
+     *
+     * @param date the date used to filter the task list
+     * @return true when {@code date} falls within the event's date range
+     */
+    @Override
+    public boolean occursOn(LocalDate date) {
+        LocalDate startDate = from.toLocalDate();
+        LocalDate endDate = to.toLocalDate();
+        return !date.isBefore(startDate) && !date.isAfter(endDate);
     }
 
     /**
@@ -52,7 +67,7 @@ public class Event extends Task {
      */
     @Override
     public String toDataString() {
-        return super.toDataString() + " | " + escapeDataField(formatDate(from))
-                + " | " + escapeDataField(formatDate(to));
+        return super.toDataString() + " | " + escapeDataField(formatDateForStorage(from))
+                + " | " + escapeDataField(formatDateForStorage(to));
     }
 }

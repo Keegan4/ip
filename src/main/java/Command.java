@@ -5,7 +5,7 @@
  */
 public enum Command {
     BYE("bye", false),
-    LIST("list", false),
+    LIST("list", true),
     MARK("mark", true),
     UNMARK("unmark", true),
     DELETE("delete", true),
@@ -33,7 +33,7 @@ public enum Command {
     /**
      * Finds the command represented by a complete user message.
      *
-     * Written by Codex: Preserve the original rule that list and bye must not have arguments.
+     * The list command may include a date filter, while bye takes no arguments.
      *
      * @param message the complete user message
      * @return the matching command

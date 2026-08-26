@@ -1,6 +1,6 @@
 # Error Catalogue
 
-This file lists all anticipated user-input errors in the current command-line interface. Deadline and event date-time values use the strict `yyyy-MM-dd HH:mm` format.
+This file lists all anticipated user-input errors in the current command-line interface. Deadline and event date-time inputs and stored values use the strict `yyyy-MM-dd HH:mm` format; confirmations and lists display them as `MMM dd yyyy HH:mm`.
 
 | Command or condition | Error condition | Exception | User-facing response |
 | --- | --- | --- | --- |
@@ -11,6 +11,7 @@ This file lists all anticipated user-input errors in the current command-line in
 | `event` | Description is missing or blank | `EmptyDescriptionException` | `OOPS!!! This panda needs an event description before it can get to work.` |
 | `event` | `/from` or `/to` information is missing or empty | `MissingDateTimeException` | `OOPS!!! This panda needs more timing details. Try: event <description> /from <start> /to <end>.` |
 | `event` | `/from` or `/to` is malformed or is not a real date and time | `InvalidDateException` | `OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.` |
+| `list` | Optional date is malformed, impossible, or contains extra arguments | `InvalidDateException` | `OOPS!!! This panda needs a valid list date in yyyy-MM-dd format.` |
 | `mark`, `unmark`, or `delete` | Task number is missing or is not an integer | `InvalidTaskNumberException` | `OOPS!!! This panda needs a valid task number after <command>.` |
 | `mark`, `unmark`, or `delete` | Task number is below 1 or greater than the number of stored tasks | `InvalidTaskNumberException` | `OOPS!!! This panda cannot find task <number> in the bamboo stack.` |
 | Any unsupported command | Command name is not recognized | `InvalidCommandException` | `OOPS!!! I'm bamboo-zled; I don't know what that means :-(` |
