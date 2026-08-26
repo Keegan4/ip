@@ -3,6 +3,7 @@ package panda.parser;
 import java.time.LocalDate;
 
 import panda.exception.EmptyDescriptionException;
+import panda.exception.EmptySearchTermException;
 import panda.exception.InvalidDateException;
 import panda.exception.InvalidTaskNumberException;
 import panda.exception.MissingDateTimeException;
@@ -41,11 +42,24 @@ public class Parser {
         return switch (command) {
         case BYE -> ParsedCommand.withoutArgument(command);
         case LIST -> parseList(message, command);
+        case FIND -> parseFind(message, command);
         case MARK, UNMARK, DELETE -> parseTaskNumber(message, command);
         case TODO -> parseTodo(message, command);
         case DEADLINE -> parseDeadline(message, command);
         case EVENT -> parseEvent(message, command);
         };
+    }
+
+    /**
+     * Parses the keyword used to search task names.
+     */
+    private ParsedCommand parseFind(String message, Command command)
+            throws EmptySearchTermException {
+        String searchTerm = getArguments(message, command);
+        if (searchTerm.isBlank()) {
+            throw new EmptySearchTermException();
+        }
+        return ParsedCommand.withSearchTerm(command, searchTerm);
     }
 
     /**
@@ -163,35 +177,43 @@ public class Parser {
      * @param task a parsed task for task-creation commands
      * @param taskNumber a number for mark, unmark, or delete
      * @param filterDate an optional date supplied to list
+     * @param searchTerm a keyword supplied to find
      */
     public record ParsedCommand(Command command, Task task, Integer taskNumber,
-            LocalDate filterDate) {
+            LocalDate filterDate, String searchTerm) {
         /**
          * Creates a parsed command without an argument.
          */
         private static ParsedCommand withoutArgument(Command command) {
-            return new ParsedCommand(command, null, null, null);
+            return new ParsedCommand(command, null, null, null, null);
         }
 
         /**
          * Creates a parsed task-creation command.
          */
         private static ParsedCommand withTask(Command command, Task task) {
-            return new ParsedCommand(command, task, null, null);
+            return new ParsedCommand(command, task, null, null, null);
         }
 
         /**
          * Creates a parsed numbered command.
          */
         private static ParsedCommand withTaskNumber(Command command, int taskNumber) {
-            return new ParsedCommand(command, null, taskNumber, null);
+            return new ParsedCommand(command, null, taskNumber, null, null);
         }
 
         /**
          * Creates a parsed list command with an optional date filter.
          */
         private static ParsedCommand withFilterDate(Command command, LocalDate filterDate) {
-            return new ParsedCommand(command, null, null, filterDate);
+            return new ParsedCommand(command, null, null, filterDate, null);
+        }
+
+        /**
+         * Creates a parsed find command with its search term.
+         */
+        private static ParsedCommand withSearchTerm(Command command, String searchTerm) {
+            return new ParsedCommand(command, null, null, null, searchTerm);
         }
     }
 }

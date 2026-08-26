@@ -2,7 +2,7 @@
 
 ## Configuration
 
-- Setup command: `javac -d build/classes src/main/java/panda/exception/PandaException.java src/main/java/panda/exception/EmptyDescriptionException.java src/main/java/panda/exception/InvalidCommandException.java src/main/java/panda/exception/InvalidTaskNumberException.java src/main/java/panda/exception/MissingDateTimeException.java src/main/java/panda/exception/InvalidDateException.java src/main/java/panda/exception/DataLoadingException.java src/main/java/panda/exception/DataSavingException.java src/main/java/panda/parser/Command.java src/main/java/panda/task/Task.java src/main/java/panda/task/Todo.java src/main/java/panda/task/Deadline.java src/main/java/panda/task/Event.java src/main/java/panda/ui/Ui.java src/main/java/panda/storage/Storage.java src/main/java/panda/task/TaskList.java src/main/java/panda/parser/Parser.java src/main/java/panda/Panda.java`
+- Setup command: `javac -d build/classes src/main/java/panda/exception/PandaException.java src/main/java/panda/exception/EmptyDescriptionException.java src/main/java/panda/exception/EmptySearchTermException.java src/main/java/panda/exception/InvalidCommandException.java src/main/java/panda/exception/InvalidTaskNumberException.java src/main/java/panda/exception/MissingDateTimeException.java src/main/java/panda/exception/InvalidDateException.java src/main/java/panda/exception/DataLoadingException.java src/main/java/panda/exception/DataSavingException.java src/main/java/panda/parser/Command.java src/main/java/panda/task/Task.java src/main/java/panda/task/Todo.java src/main/java/panda/task/Deadline.java src/main/java/panda/task/Event.java src/main/java/panda/ui/Ui.java src/main/java/panda/storage/Storage.java src/main/java/panda/task/TaskList.java src/main/java/panda/parser/Parser.java src/main/java/panda/Panda.java`
 - Run command: `python test/run_panda_ui.py`
 - Timeout seconds: `10`
 
@@ -88,6 +88,81 @@ Here are the tasks in your list:
 3.[E][ ] project meeting (from: Aug 06 2019 14:00 to: Aug 08 2019 16:00)
 4.[T][X] join sports club
 5.[T][ ] buy bread | milk
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Find tasks by name
+
+Aim: Verify that `find <keyword>` performs case-insensitive substring matching across task types, preserves original task numbers, and shows only matching tasks.
+
+Run command: `python test/run_panda_ui.py --fixture test/data/ui-valid-tasks.txt`
+
+Input:
+
+```text
+find BOOK
+find bread
+find homework
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+Here are the matching tasks in your list:
+1.[T][X] read book
+2.[D][ ] return book (by: Jun 06 2019 18:00)
+____________________________________________________________
+____________________________________________________________
+Here are the matching tasks in your list:
+5.[T][ ] buy bread | milk
+____________________________________________________________
+____________________________________________________________
+Here are the matching tasks in your list:
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Reject a find command without a keyword
+
+Aim: Verify that `find` without a keyword reports EmptySearchTermException and does not change the task list.
+
+Input:
+
+```text
+find
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+OOPS!!! This panda needs a search keyword after find.
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
