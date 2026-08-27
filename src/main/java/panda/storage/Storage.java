@@ -109,25 +109,27 @@ public class Storage {
             throw new DataLoadingException(lineNumber, "no task description.");
         }
 
-        Task task = switch (fields[0]) {
-        case "T" -> {
-            ensureStoredFieldCount(fields, 3, lineNumber, "todo");
-            yield new Todo(fields[2]);
+        Task task;
+        switch (fields[0]) {
+            case "T":
+                ensureStoredFieldCount(fields, 3, lineNumber, "todo");
+                task = new Todo(fields[2]);
+                break;
+            case "D":
+                ensureStoredFieldCount(fields, 4, lineNumber, "deadline");
+                ensureStoredValue(fields[3], lineNumber, "no deadline time.");
+                task = new Deadline(fields[2], fields[3]);
+                break;
+            case "E":
+                ensureStoredFieldCount(fields, 5, lineNumber, "event");
+                ensureStoredValue(fields[3], lineNumber, "no event start time.");
+                ensureStoredValue(fields[4], lineNumber, "no event end time.");
+                task = new Event(fields[2], fields[3], fields[4]);
+                break;
+            default:
+                throw new DataLoadingException(lineNumber,
+                        "an invalid task type; expected T, D, or E.");
         }
-        case "D" -> {
-            ensureStoredFieldCount(fields, 4, lineNumber, "deadline");
-            ensureStoredValue(fields[3], lineNumber, "no deadline time.");
-            yield new Deadline(fields[2], fields[3]);
-        }
-        case "E" -> {
-            ensureStoredFieldCount(fields, 5, lineNumber, "event");
-            ensureStoredValue(fields[3], lineNumber, "no event start time.");
-            ensureStoredValue(fields[4], lineNumber, "no event end time.");
-            yield new Event(fields[2], fields[3], fields[4]);
-        }
-        default -> throw new DataLoadingException(lineNumber,
-                "an invalid task type; expected T, D, or E.");
-        };
 
         if (fields[1].equals("1")) {
             task.mark();

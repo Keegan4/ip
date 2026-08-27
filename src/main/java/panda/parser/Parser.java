@@ -45,15 +45,24 @@ public class Parser {
      */
     public ParsedCommand parse(String message) throws PandaException {
         Command command = Command.findCommand(message);
-        return switch (command) {
-        case BYE -> ParsedCommand.createWithoutArgument(command);
-        case LIST -> parseList(message, command);
-        case FIND -> parseFind(message, command);
-        case MARK, UNMARK, DELETE -> parseTaskNumber(message, command);
-        case TODO -> parseTodo(message, command);
-        case DEADLINE -> parseDeadline(message, command);
-        case EVENT -> parseEvent(message, command);
-        };
+        switch (command) {
+            case BYE:
+                return ParsedCommand.createWithoutArgument(command);
+            case LIST:
+                return parseList(message, command);
+            case FIND:
+                return parseFind(message, command);
+            case MARK, UNMARK, DELETE:
+                return parseTaskNumber(message, command);
+            case TODO:
+                return parseTodo(message, command);
+            case DEADLINE:
+                return parseDeadline(message, command);
+            case EVENT:
+                return parseEvent(message, command);
+            default:
+                throw new IllegalStateException("Unsupported command: " + command);
+        }
     }
 
     /**
@@ -179,11 +188,11 @@ public class Parser {
      * Fields that do not apply to a particular command are null; the factory
      * methods keep those combinations consistent inside the parser.
      *
-     * @param command the recognized command type
-     * @param task a parsed task for task-creation commands
-     * @param taskNumber a number for mark, unmark, or delete
-     * @param filterDate an optional date supplied to list
-     * @param searchTerm a keyword supplied to find
+     * @param command the recognized command type.
+     * @param task a parsed task for task-creation commands.
+     * @param taskNumber a number for mark, unmark, or delete.
+     * @param filterDate an optional date supplied to list.
+     * @param searchTerm a keyword supplied to find.
      */
     public record ParsedCommand(Command command, Task task, Integer taskNumber,
             LocalDate filterDate, String searchTerm) {
@@ -214,6 +223,7 @@ public class Parser {
         private static ParsedCommand createWithFilterDate(Command command, LocalDate filterDate) {
             return new ParsedCommand(command, null, null, filterDate, null);
         }
+
         /**
          * Creates a parsed find command with its search term.
          */

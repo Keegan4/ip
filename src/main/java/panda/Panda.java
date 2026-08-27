@@ -65,7 +65,6 @@ public class Panda {
 
     /**
      * Loads tasks and runs the command-processing loop.
-     *
      */
     public void run() {
         ui.showWelcome();
@@ -83,46 +82,47 @@ public class Panda {
             try {
                 Parser.ParsedCommand parsedCommand = parser.parse(message);
                 switch (parsedCommand.command()) {
-                case LIST -> {
-                    ui.showTaskListHeader();
-                    List<TaskList.NumberedTask> displayedTasks =
-                            parsedCommand.filterDate() == null
-                                    ? tasks.getTasks()
-                                    : tasks.getTasksOn(parsedCommand.filterDate());
-                    for (TaskList.NumberedTask numberedTask : displayedTasks) {
-                        ui.showTask(numberedTask.number(), numberedTask.task());
-                    }
-                }
-                case FIND -> {
-                    ui.showMatchingTaskListHeader();
-                    List<TaskList.NumberedTask> matchingTasks =
-                            tasks.getTasksMatching(parsedCommand.searchTerm());
-                    for (TaskList.NumberedTask numberedTask : matchingTasks) {
-                        ui.showTask(numberedTask.number(), numberedTask.task());
-                    }
-                }
-                case MARK -> {
-                    Task task = tasks.mark(parsedCommand.taskNumber());
-                    ui.showMarked(task);
-                    storage.save(tasks.getTaskSnapshot());
-                }
-                case UNMARK -> {
-                    Task task = tasks.unmark(parsedCommand.taskNumber());
-                    ui.showUnmarked(task);
-                    storage.save(tasks.getTaskSnapshot());
-                }
-                case DELETE -> {
-                    Task removedTask = tasks.delete(parsedCommand.taskNumber());
-                    ui.showDeleted(removedTask, tasks.getTaskCount());
-                    storage.save(tasks.getTaskSnapshot());
-                }
-                case EVENT, DEADLINE, TODO -> {
-                    Task task = parsedCommand.task();
-                    tasks.add(task);
-                    ui.showAdded(task, tasks.getTaskCount());
-                    storage.save(tasks.getTaskSnapshot());
-                }
-                case BYE -> throw new IllegalStateException("The bye command should exit before dispatch.");
+                    case LIST:
+                        ui.showTaskListHeader();
+                        List<TaskList.NumberedTask> displayedTasks =
+                                parsedCommand.filterDate() == null
+                                        ? tasks.getTasks()
+                                        : tasks.getTasksOn(parsedCommand.filterDate());
+                        for (TaskList.NumberedTask numberedTask : displayedTasks) {
+                            ui.showTask(numberedTask.number(), numberedTask.task());
+                        }
+                        break;
+                    case FIND:
+                        ui.showMatchingTaskListHeader();
+                        List<TaskList.NumberedTask> matchingTasks =
+                                tasks.getTasksMatching(parsedCommand.searchTerm());
+                        for (TaskList.NumberedTask numberedTask : matchingTasks) {
+                            ui.showTask(numberedTask.number(), numberedTask.task());
+                        }
+                        break;
+                    case MARK:
+                        Task markedTask = tasks.mark(parsedCommand.taskNumber());
+                        ui.showMarked(markedTask);
+                        storage.save(tasks.getTaskSnapshot());
+                        break;
+                    case UNMARK:
+                        Task unmarkedTask = tasks.unmark(parsedCommand.taskNumber());
+                        ui.showUnmarked(unmarkedTask);
+                        storage.save(tasks.getTaskSnapshot());
+                        break;
+                    case DELETE:
+                        Task removedTask = tasks.delete(parsedCommand.taskNumber());
+                        ui.showDeleted(removedTask, tasks.getTaskCount());
+                        storage.save(tasks.getTaskSnapshot());
+                        break;
+                    case EVENT, DEADLINE, TODO:
+                        Task newTask = parsedCommand.task();
+                        tasks.add(newTask);
+                        ui.showAdded(newTask, tasks.getTaskCount());
+                        storage.save(tasks.getTaskSnapshot());
+                        break;
+                    case BYE:
+                        throw new IllegalStateException("The bye command should exit before dispatch.");
                 }
             } catch (PandaException exception) {
                 // Show expected input errors and continue accepting commands.
