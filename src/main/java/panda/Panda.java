@@ -123,6 +123,9 @@ public class Panda {
                         break;
                     case BYE:
                         throw new IllegalStateException("The bye command should exit before dispatch.");
+
+                    default:
+                        throw new IllegalStateException("This should not be reachable");
                 }
             } catch (PandaException exception) {
                 // Show expected input errors and continue accepting commands.
