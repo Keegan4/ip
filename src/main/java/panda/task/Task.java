@@ -16,8 +16,6 @@ import panda.exception.InvalidDateException;
  * status changes are handled by the task itself.
  */
 public abstract class Task {
-    private final String name;
-    private boolean isDone;
     private static final DateTimeFormatter INPUT_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm")
                     .withResolverStyle(ResolverStyle.STRICT);
@@ -26,6 +24,9 @@ public abstract class Task {
                     .withResolverStyle(ResolverStyle.STRICT);
     private static final DateTimeFormatter DISPLAY_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("MMM dd uuuu HH:mm", Locale.ENGLISH);
+    private final String name;
+    private boolean isDone;
+
 
     /**
      * Creates a new unfinished task with the given name.

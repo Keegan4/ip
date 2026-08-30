@@ -99,10 +99,12 @@ class ParserTest {
         assertThrows(EmptySearchTermException.class, () -> parser.parse("find"));
         assertThrows(InvalidTaskNumberException.class, () -> parser.parse("mark bamboo"));
         assertThrows(InvalidDateException.class, () -> parser.parse("list 2025-02-29"));
-        assertThrows(MissingDateTimeException.class,
-                () -> parser.parse("deadline submit report"));
-        assertThrows(MissingDateTimeException.class,
-                () -> parser.parse("event meeting /from 2026-09-02 14:00"));
+        assertThrows(MissingDateTimeException.class, () ->
+                parser.parse("deadline submit report")
+        );
+        assertThrows(MissingDateTimeException.class, () ->
+                parser.parse("event meeting /from 2026-09-02 14:00")
+        );
     }
 
     @Test
