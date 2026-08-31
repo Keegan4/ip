@@ -1,5 +1,6 @@
 package panda;
 
+import java.io.Console;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -70,7 +71,28 @@ public class Panda {
      * @return msg to show the reader
      */
     public String getResponse(String msg) {
-        return "I like: " + msg;
+        if (parser.isExitCommand(msg)) {
+            return ui.showGoodbye();
+        }
+        try {
+            Parser.ParsedCommand parsedCommand = parser.parse(msg);
+            switch (parsedCommand.command()) {
+                case LIST:
+                    StringBuilder toShow = new StringBuilder(ui.showTaskListHeader() + "\n");
+
+                    List<TaskList.NumberedTask> displayedTasks =
+                            parsedCommand.filterDate() == null
+                                    ? tasks.getTasks()
+                                    : tasks.getTasksOn(parsedCommand.filterDate());
+                    for (TaskList.NumberedTask numberedTask : displayedTasks) {
+                        toShow.append(ui.showTask(numberedTask.number(), numberedTask.task()));
+                    }
+                    return toShow.toString();
+            }
+        } catch (PandaException exception) {
+            ui.showError(exception);
+        }
+        return "Unknown result!";
     }
 
     /**

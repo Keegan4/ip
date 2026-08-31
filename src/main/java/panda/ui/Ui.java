@@ -34,11 +34,12 @@ public class Ui {
     /**
      * Displays Panda's greeting.
      */
-    public void showWelcome() {
+    public String showWelcome() {
         System.out.println(DIVIDER);
         System.out.println(BANNER);
         System.out.println("Hello! I'm Panda.");
         System.out.println("What can I do for you?");
+        return BANNER + "\n\n"+ "Hello! I'm Panda.\nWhat can I do for you?";
     }
 
     /**
@@ -82,8 +83,9 @@ public class Ui {
     /**
      * Displays the heading used for full and filtered task lists.
      */
-    public void showTaskListHeader() {
+    public String showTaskListHeader() {
         System.out.println("Here are the tasks in your list:");
+        return "Here are the tasks in your list:";
     }
 
     /**
@@ -99,10 +101,12 @@ public class Ui {
      * @param taskNumber the task's one-based position in the complete list.
      * @param task the task to display.
      */
-    public void showTask(int taskNumber, Task task) {
+    public String showTask(int taskNumber, Task task) {
         String status = task.isDone() ? "X" : " ";
-        System.out.printf("%d.[%s][%s] %s%n", taskNumber, task.getTypeMarker(),
+        String taskDesc = String.format("%d.[%s][%s] %s%n", taskNumber, task.getTypeMarker(),
                 status, task.getDisplayText());
+        System.out.printf(taskDesc);
+        return taskDesc;
     }
 
     /**
@@ -163,10 +167,11 @@ public class Ui {
     /**
      * Displays Panda's closing message.
      */
-    public void showGoodbye() {
+    public String showGoodbye() {
         showDivider();
         System.out.println("Bye. Hope to see you again soon!");
         showDivider();
+        return "Bye. Hope to see you again soon!";
     }
 
     /**
