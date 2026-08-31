@@ -64,6 +64,16 @@ public class Panda {
     }
 
     /**
+     * Gets a response based on a message.
+     *
+     * @param msg the message to ask the chatbot.
+     * @return msg to show the reader
+     */
+    public String getResponse(String msg) {
+        return "I like: " + msg;
+    }
+
+    /**
      * Loads tasks and runs the command-processing loop.
      */
     public void run() {
