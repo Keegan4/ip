@@ -74,50 +74,37 @@ public class Panda {
             return ui.showGoodbye();
         }
 
-        StringBuilder response = new StringBuilder();
         try {
             Parser.ParsedCommand parsedCommand = parser.parse(message);
 
             switch (parsedCommand.command()) {
                 case LIST:
-                    response.append(ui.showTaskListHeader());
                     List<TaskList.NumberedTask> displayedTasks =
                             parsedCommand.filterDate() == null
                                     ? tasks.getTasks()
                                     : tasks.getTasksOn(parsedCommand.filterDate());
-                    for (TaskList.NumberedTask numberedTask : displayedTasks) {
-                        response.append(ui.showTask(numberedTask.number(), numberedTask.task()));
-                    }
-                    break;
+                    return ui.showTaskList(displayedTasks);
                 case FIND:
-                    response.append(ui.showMatchingTaskListHeader());
                     List<TaskList.NumberedTask> matchingTasks =
                             tasks.getTasksMatching(parsedCommand.searchTerm());
-                    for (TaskList.NumberedTask numberedTask : matchingTasks) {
-                        response.append(ui.showTask(numberedTask.number(), numberedTask.task()));
-                    }
-                    break;
+                    return ui.showMatchingTaskList(matchingTasks);
                 case MARK:
                     Task markedTask = tasks.mark(parsedCommand.taskNumber());
-                    response.append(ui.showMarked(markedTask));
                     storage.save(tasks.getTaskSnapshot());
-                    break;
+                    return ui.showMarked(markedTask);
                 case UNMARK:
                     Task unmarkedTask = tasks.unmark(parsedCommand.taskNumber());
-                    response.append(ui.showUnmarked(unmarkedTask));
                     storage.save(tasks.getTaskSnapshot());
-                    break;
+                    return ui.showUnmarked(unmarkedTask);
                 case DELETE:
                     Task removedTask = tasks.delete(parsedCommand.taskNumber());
-                    response.append(ui.showDeleted(removedTask, tasks.getTaskCount()));
                     storage.save(tasks.getTaskSnapshot());
-                    break;
+                    return ui.showDeleted(removedTask, tasks.getTaskCount());
                 case EVENT, DEADLINE, TODO:
                     Task newTask = parsedCommand.task();
                     tasks.add(newTask);
-                    response.append(ui.showAdded(newTask, tasks.getTaskCount()));
                     storage.save(tasks.getTaskSnapshot());
-                    break;
+                    return ui.showAdded(newTask, tasks.getTaskCount());
                 case BYE:
                     throw new IllegalStateException("The bye command should exit before dispatch.");
                 default:
@@ -126,8 +113,6 @@ public class Panda {
         } catch (PandaException exception) {
             return ui.showError(exception);
         }
-
-        return response.toString();
     }
 
     /**
@@ -160,22 +145,16 @@ public class Panda {
                 Parser.ParsedCommand parsedCommand = parser.parse(message);
                 switch (parsedCommand.command()) {
                     case LIST:
-                        ui.showTaskListHeader();
                         List<TaskList.NumberedTask> displayedTasks =
                                 parsedCommand.filterDate() == null
                                         ? tasks.getTasks()
                                         : tasks.getTasksOn(parsedCommand.filterDate());
-                        for (TaskList.NumberedTask numberedTask : displayedTasks) {
-                            ui.showTask(numberedTask.number(), numberedTask.task());
-                        }
+                        ui.showTaskList(displayedTasks);
                         break;
                     case FIND:
-                        ui.showMatchingTaskListHeader();
                         List<TaskList.NumberedTask> matchingTasks =
                                 tasks.getTasksMatching(parsedCommand.searchTerm());
-                        for (TaskList.NumberedTask numberedTask : matchingTasks) {
-                            ui.showTask(numberedTask.number(), numberedTask.task());
-                        }
+                        ui.showMatchingTaskList(matchingTasks);
                         break;
                     case MARK:
                         Task markedTask = tasks.mark(parsedCommand.taskNumber());

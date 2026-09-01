@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import panda.exception.PandaException;
 import panda.task.Task;
+import panda.task.TaskList;
 
 /**
  * Handles all command-line input and output for Panda.
@@ -35,7 +36,9 @@ public class Ui {
      * Displays Panda's greeting.
      */
     public String showWelcome() {
-        String welcomeMessage = BANNER + "\nHello! I'm Panda.\nWhat can I do for you?";
+        String welcomeMessage = formatLines(
+                BANNER.stripTrailing(), "", "Hello! I'm Panda.", "What can I do for you?")
+                .stripTrailing();
         System.out.println(DIVIDER);
         System.out.println(welcomeMessage);
         return welcomeMessage;
@@ -80,35 +83,24 @@ public class Ui {
     }
 
     /**
-     * Displays the heading used for full and filtered task lists.
-     */
-    public String showTaskListHeader() {
-        String response = "Here are the tasks in your list:\n";
-        System.out.print(response);
-        return response;
-    }
-
-    /**
-     * Displays the heading used for task-name search results.
-     */
-    public String showMatchingTaskListHeader() {
-        String response = "Here are the matching tasks in your list:\n";
-        System.out.print(response);
-        return response;
-    }
-
-    /**
-     * Displays one task with its original one-based task number.
+     * Displays all supplied tasks under the standard task-list heading.
      *
-     * @param taskNumber the task's one-based position in the complete list.
-     * @param task the task to display.
+     * @param numberedTasks the tasks and their one-based numbers.
+     * @return the formatted task-list response.
      */
-    public String showTask(int taskNumber, Task task) {
-        String status = task.isDone() ? "X" : " ";
-        String response = String.format("%d.[%s][%s] %s%n", taskNumber, task.getTypeMarker(),
-                status, task.getDisplayText());
-        System.out.print(response);
-        return response;
+    public String showTaskList(List<TaskList.NumberedTask> numberedTasks) {
+        return showNumberedTasks("Here are the tasks in your list:", numberedTasks);
+    }
+
+    /**
+     * Displays all supplied tasks under the search-result heading.
+     *
+     * @param numberedTasks the matching tasks and their original one-based numbers.
+     * @return the formatted matching-task response.
+     */
+    public String showMatchingTaskList(List<TaskList.NumberedTask> numberedTasks) {
+        return showNumberedTasks(
+                "Here are the matching tasks in your list:", numberedTasks);
     }
 
     /**
@@ -117,8 +109,9 @@ public class Ui {
      * @param task the task that was marked.
      */
     public String showMarked(Task task) {
-        String response = String.format(
-                "Nice! I've marked this task as done:%n  [X] %s%n", task.getName());
+        String response = formatLines(
+                "Nice! I've marked this task as done:",
+                String.format("  [X] %s", task.getName()));
         System.out.print(response);
         return response;
     }
@@ -129,8 +122,9 @@ public class Ui {
      * @param task the task that was unmarked.
      */
     public String showUnmarked(Task task) {
-        String response = String.format(
-                "OK, I've marked this task as not done yet:%n  [ ] %s%n", task.getName());
+        String response = formatLines(
+                "OK, I've marked this task as not done yet:",
+                String.format("  [ ] %s", task.getName()));
         System.out.print(response);
         return response;
     }
@@ -143,9 +137,10 @@ public class Ui {
      */
     public String showDeleted(Task task, int remainingTaskCount) {
         String status = task.isDone() ? "X" : " ";
-        String response = String.format(
-                "Noted. I've removed this task:%n  [%s][%s] %s%n%s",
-                task.getTypeMarker(), status, task.getDisplayText(),
+        String response = formatLines(
+                "Noted. I've removed this task:",
+                String.format("  [%s][%s] %s", task.getTypeMarker(), status,
+                        task.getDisplayText()),
                 formatTaskCount(remainingTaskCount));
         System.out.print(response);
         return response;
@@ -158,9 +153,10 @@ public class Ui {
      * @param taskCount the new total number of tasks.
      */
     public String showAdded(Task task, int taskCount) {
-        String response = String.format(
-                "Got it. I've added this task:%n  [%s][ ] %s%n%s",
-                task.getTypeMarker(), task.getDisplayText(), formatTaskCount(taskCount));
+        String response = formatLines(
+                "Got it. I've added this task:",
+                String.format("  [%s][ ] %s", task.getTypeMarker(), task.getDisplayText()),
+                formatTaskCount(taskCount));
         System.out.print(response);
         return response;
     }
@@ -193,6 +189,43 @@ public class Ui {
      */
     private String formatTaskCount(int taskCount) {
         String taskNoun = taskCount == 1 ? "task" : "tasks";
-        return String.format("Now you have %d %s in the list.%n", taskCount, taskNoun);
+        return String.format("Now you have %d %s in the list.", taskCount, taskNoun);
+    }
+
+    /**
+     * Displays numbered tasks below the supplied heading.
+     */
+    private String showNumberedTasks(String heading,
+            List<TaskList.NumberedTask> numberedTasks) {
+        String[] lines = new String[numberedTasks.size() + 1];
+        lines[0] = heading;
+        for (int i = 0; i < numberedTasks.size(); i++) {
+            TaskList.NumberedTask numberedTask = numberedTasks.get(i);
+            lines[i + 1] = formatNumberedTask(numberedTask);
+        }
+
+        String response = formatLines(lines);
+        System.out.print(response);
+        return response;
+    }
+
+    /**
+     * Formats one task with its original one-based task number.
+     */
+    private String formatNumberedTask(TaskList.NumberedTask numberedTask) {
+        Task task = numberedTask.task();
+        String status = task.isDone() ? "X" : " ";
+        return String.format("%d.[%s][%s] %s", numberedTask.number(),
+                task.getTypeMarker(), status, task.getDisplayText());
+    }
+
+    /**
+     * Joins response lines and terminates the formatted text with a line separator.
+     *
+     * @param lines the response lines in display order.
+     * @return the formatted multi-line response.
+     */
+    private String formatLines(String... lines) {
+        return String.join(System.lineSeparator(), lines) + System.lineSeparator();
     }
 }
