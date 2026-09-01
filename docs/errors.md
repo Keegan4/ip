@@ -15,6 +15,7 @@ This file lists all anticipated user-input errors in the current command-line in
 | `find` | Search keyword is missing or blank | `EmptySearchTermException` | `OOPS!!! This panda needs a search keyword after find.` |
 | `mark`, `unmark`, or `delete` | Task number is missing or is not an integer | `InvalidTaskNumberException` | `OOPS!!! This panda needs a valid task number after <command>.` |
 | `mark`, `unmark`, or `delete` | Task number is below 1 or greater than the number of stored tasks | `InvalidTaskNumberException` | `OOPS!!! This panda cannot find task <number> in the bamboo stack.` |
+| `bye` | Any arguments follow `bye` | `InvalidCommandException` | `OOPS!!! I'm bamboo-zled; I don't know what that means :-(` |
 | Any unsupported command | Command name is not recognized | `InvalidCommandException` | `OOPS!!! I'm bamboo-zled; I don't know what that means :-(` |
 | Startup data loading | A stored record has an unknown task type, invalid completion status, missing field, or incorrect number of fields | `DataLoadingException` handled at the individual-record boundary | `Line <number> has <error>`; skip that record and continue loading valid records. |
 | Startup data loading | The configured data file exists but cannot be opened or read | `DataLoadingException` | `OOPS!!! This panda cannot read its bamboo archive at <path>.` |

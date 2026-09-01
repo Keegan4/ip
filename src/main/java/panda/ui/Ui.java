@@ -34,11 +34,11 @@ public class Ui {
     /**
      * Displays Panda's greeting.
      */
-    public void showWelcome() {
+    public String showWelcome() {
+        String welcomeMessage = BANNER + "\nHello! I'm Panda.\nWhat can I do for you?";
         System.out.println(DIVIDER);
-        System.out.println(BANNER);
-        System.out.println("Hello! I'm Panda.");
-        System.out.println("What can I do for you?");
+        System.out.println(welcomeMessage);
+        return welcomeMessage;
     }
 
     /**
@@ -82,15 +82,19 @@ public class Ui {
     /**
      * Displays the heading used for full and filtered task lists.
      */
-    public void showTaskListHeader() {
-        System.out.println("Here are the tasks in your list:");
+    public String showTaskListHeader() {
+        String response = "Here are the tasks in your list:\n";
+        System.out.print(response);
+        return response;
     }
 
     /**
      * Displays the heading used for task-name search results.
      */
-    public void showMatchingTaskListHeader() {
-        System.out.println("Here are the matching tasks in your list:");
+    public String showMatchingTaskListHeader() {
+        String response = "Here are the matching tasks in your list:\n";
+        System.out.print(response);
+        return response;
     }
 
     /**
@@ -99,10 +103,12 @@ public class Ui {
      * @param taskNumber the task's one-based position in the complete list.
      * @param task the task to display.
      */
-    public void showTask(int taskNumber, Task task) {
+    public String showTask(int taskNumber, Task task) {
         String status = task.isDone() ? "X" : " ";
-        System.out.printf("%d.[%s][%s] %s%n", taskNumber, task.getTypeMarker(),
+        String response = String.format("%d.[%s][%s] %s%n", taskNumber, task.getTypeMarker(),
                 status, task.getDisplayText());
+        System.out.print(response);
+        return response;
     }
 
     /**
@@ -110,9 +116,11 @@ public class Ui {
      *
      * @param task the task that was marked.
      */
-    public void showMarked(Task task) {
-        System.out.println("Nice! I've marked this task as done:");
-        System.out.printf("  [X] %s%n", task.getName());
+    public String showMarked(Task task) {
+        String response = String.format(
+                "Nice! I've marked this task as done:%n  [X] %s%n", task.getName());
+        System.out.print(response);
+        return response;
     }
 
     /**
@@ -120,9 +128,11 @@ public class Ui {
      *
      * @param task the task that was unmarked.
      */
-    public void showUnmarked(Task task) {
-        System.out.println("OK, I've marked this task as not done yet:");
-        System.out.printf("  [ ] %s%n", task.getName());
+    public String showUnmarked(Task task) {
+        String response = String.format(
+                "OK, I've marked this task as not done yet:%n  [ ] %s%n", task.getName());
+        System.out.print(response);
+        return response;
     }
 
     /**
@@ -131,12 +141,14 @@ public class Ui {
      * @param task the removed task.
      * @param remainingTaskCount the number of tasks left in the list.
      */
-    public void showDeleted(Task task, int remainingTaskCount) {
+    public String showDeleted(Task task, int remainingTaskCount) {
         String status = task.isDone() ? "X" : " ";
-        System.out.println("Noted. I've removed this task:");
-        System.out.printf("  [%s][%s] %s%n", task.getTypeMarker(), status,
-                task.getDisplayText());
-        showTaskCount(remainingTaskCount);
+        String response = String.format(
+                "Noted. I've removed this task:%n  [%s][%s] %s%n%s",
+                task.getTypeMarker(), status, task.getDisplayText(),
+                formatTaskCount(remainingTaskCount));
+        System.out.print(response);
+        return response;
     }
 
     /**
@@ -145,10 +157,12 @@ public class Ui {
      * @param task the new task.
      * @param taskCount the new total number of tasks.
      */
-    public void showAdded(Task task, int taskCount) {
-        System.out.println("Got it. I've added this task:");
-        System.out.printf("  [%s][ ] %s%n", task.getTypeMarker(), task.getDisplayText());
-        showTaskCount(taskCount);
+    public String showAdded(Task task, int taskCount) {
+        String response = String.format(
+                "Got it. I've added this task:%n  [%s][ ] %s%n%s",
+                task.getTypeMarker(), task.getDisplayText(), formatTaskCount(taskCount));
+        System.out.print(response);
+        return response;
     }
 
     /**
@@ -156,25 +170,29 @@ public class Ui {
      *
      * @param exception the expected application error.
      */
-    public void showError(PandaException exception) {
+    public String showError(PandaException exception) {
         System.out.println(exception.getMessage());
+        return exception.getMessage();
     }
 
     /**
      * Displays Panda's closing message.
      */
-    public void showGoodbye() {
+    public String showGoodbye() {
         showDivider();
         System.out.println("Bye. Hope to see you again soon!");
         showDivider();
+        return "Bye. Hope to see you again soon!";
     }
 
     /**
-     * Displays the total task count after a list mutation.
+     * Formats the total task count after a list mutation.
      *
      * @param taskCount the current number of tasks.
+     * @return the grammatically correct task-count message.
      */
-    private void showTaskCount(int taskCount) {
-        System.out.printf("Now you have %d tasks in the list.%n", taskCount);
+    private String formatTaskCount(int taskCount) {
+        String taskNoun = taskCount == 1 ? "task" : "tasks";
+        return String.format("Now you have %d %s in the list.%n", taskCount, taskNoun);
     }
 }

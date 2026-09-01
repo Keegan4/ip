@@ -12,7 +12,7 @@ import panda.task.TaskList;
 import panda.ui.Ui;
 
 /**
- * Runs the Panda task manager's command-line interface.
+ * Runs the Panda task manager and coordinates its user interfaces.
  *
  * Coordinates command parsing, task storage, and user-facing output.
  */
@@ -61,6 +61,83 @@ public class Panda {
         String filePath = args.length > 0
                 ? args[0] : DEFAULT_DATA_FILE_PATH.toString();
         new Panda(filePath).run();
+    }
+
+    /**
+     * Returns Panda's response to one command.
+     *
+     * @param message the complete user command.
+     * @return the response to display.
+     */
+    public String getResponse(String message) {
+        if (isExitCommand(message)) {
+            return ui.showGoodbye();
+        }
+
+        StringBuilder response = new StringBuilder();
+        try {
+            Parser.ParsedCommand parsedCommand = parser.parse(message);
+
+            switch (parsedCommand.command()) {
+                case LIST:
+                    response.append(ui.showTaskListHeader());
+                    List<TaskList.NumberedTask> displayedTasks =
+                            parsedCommand.filterDate() == null
+                                    ? tasks.getTasks()
+                                    : tasks.getTasksOn(parsedCommand.filterDate());
+                    for (TaskList.NumberedTask numberedTask : displayedTasks) {
+                        response.append(ui.showTask(numberedTask.number(), numberedTask.task()));
+                    }
+                    break;
+                case FIND:
+                    response.append(ui.showMatchingTaskListHeader());
+                    List<TaskList.NumberedTask> matchingTasks =
+                            tasks.getTasksMatching(parsedCommand.searchTerm());
+                    for (TaskList.NumberedTask numberedTask : matchingTasks) {
+                        response.append(ui.showTask(numberedTask.number(), numberedTask.task()));
+                    }
+                    break;
+                case MARK:
+                    Task markedTask = tasks.mark(parsedCommand.taskNumber());
+                    response.append(ui.showMarked(markedTask));
+                    storage.save(tasks.getTaskSnapshot());
+                    break;
+                case UNMARK:
+                    Task unmarkedTask = tasks.unmark(parsedCommand.taskNumber());
+                    response.append(ui.showUnmarked(unmarkedTask));
+                    storage.save(tasks.getTaskSnapshot());
+                    break;
+                case DELETE:
+                    Task removedTask = tasks.delete(parsedCommand.taskNumber());
+                    response.append(ui.showDeleted(removedTask, tasks.getTaskCount()));
+                    storage.save(tasks.getTaskSnapshot());
+                    break;
+                case EVENT, DEADLINE, TODO:
+                    Task newTask = parsedCommand.task();
+                    tasks.add(newTask);
+                    response.append(ui.showAdded(newTask, tasks.getTaskCount()));
+                    storage.save(tasks.getTaskSnapshot());
+                    break;
+                case BYE:
+                    throw new IllegalStateException("The bye command should exit before dispatch.");
+                default:
+                    throw new IllegalStateException("This should not be reachable");
+            }
+        } catch (PandaException exception) {
+            return ui.showError(exception);
+        }
+
+        return response.toString();
+    }
+
+    /**
+     * Checks whether a message is the exact command that ends the application.
+     *
+     * @param message the complete user command.
+     * @return true only for an argument-free {@code bye} command.
+     */
+    public boolean isExitCommand(String message) {
+        return parser.isExitCommand(message);
     }
 
     /**
