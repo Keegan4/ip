@@ -56,7 +56,7 @@ test {
 }
 
 application {
-    mainClass.set("gui.Launcher")
+    mainClass.set("panda.gui.Launcher")
 }
 
 jar {

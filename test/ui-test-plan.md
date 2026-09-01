@@ -35,7 +35,7 @@ What can I do for you?
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] read book
-Now you have 1 tasks in the list.
+Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
@@ -278,7 +278,7 @@ What can I do for you?
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] read book
-Now you have 1 tasks in the list.
+Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
@@ -330,7 +330,7 @@ What can I do for you?
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] borrow book
-Now you have 1 tasks in the list.
+Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
@@ -369,7 +369,7 @@ What can I do for you?
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] read book
-Now you have 1 tasks in the list.
+Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
@@ -414,7 +414,7 @@ What can I do for you?
 ____________________________________________________________
 Got it. I've added this task:
   [E][ ] team project meeting (from: Oct 02 2019 14:00 to: Oct 02 2019 16:00)
-Now you have 1 tasks in the list.
+Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
@@ -726,7 +726,7 @@ What can I do for you?
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] read book
-Now you have 1 tasks in the list.
+Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
@@ -784,7 +784,7 @@ What can I do for you?
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] buy bread | milk
-Now you have 1 tasks in the list.
+Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Got it. I've added this task:
@@ -834,7 +834,7 @@ What can I do for you?
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] borrow book
-Now you have 1 tasks in the list.
+Now you have 1 task in the list.
 OOPS!!! This panda could not save its bamboo archive.
 ____________________________________________________________
 ____________________________________________________________
@@ -874,7 +874,7 @@ What can I do for you?
 ____________________________________________________________
 Got it. I've added this task:
   [T][ ] first task
-Now you have 1 tasks in the list.
+Now you have 1 task in the list.
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
