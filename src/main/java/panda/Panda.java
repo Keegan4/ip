@@ -4,6 +4,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import panda.exception.DataLoadingException;
+import panda.exception.DataSavingException;
+import panda.exception.InvalidTaskNumberException;
 import panda.exception.PandaException;
 import panda.parser.Parser;
 import panda.storage.Storage;
@@ -76,43 +78,84 @@ public class Panda {
 
         try {
             Parser.ParsedCommand parsedCommand = parser.parse(message);
-
-            switch (parsedCommand.command()) {
-                case LIST:
-                    List<TaskList.NumberedTask> displayedTasks =
-                            parsedCommand.filterDate() == null
-                                    ? tasks.getTasks()
-                                    : tasks.getTasksOn(parsedCommand.filterDate());
-                    return ui.showTaskList(displayedTasks);
-                case FIND:
-                    List<TaskList.NumberedTask> matchingTasks =
-                            tasks.getTasksMatching(parsedCommand.searchTerm());
-                    return ui.showMatchingTaskList(matchingTasks);
-                case MARK:
-                    Task markedTask = tasks.mark(parsedCommand.taskNumber());
-                    storage.save(tasks.getTaskSnapshot());
-                    return ui.showMarked(markedTask);
-                case UNMARK:
-                    Task unmarkedTask = tasks.unmark(parsedCommand.taskNumber());
-                    storage.save(tasks.getTaskSnapshot());
-                    return ui.showUnmarked(unmarkedTask);
-                case DELETE:
-                    Task removedTask = tasks.delete(parsedCommand.taskNumber());
-                    storage.save(tasks.getTaskSnapshot());
-                    return ui.showDeleted(removedTask, tasks.getTaskCount());
-                case EVENT, DEADLINE, TODO:
-                    Task newTask = parsedCommand.task();
-                    tasks.add(newTask);
-                    storage.save(tasks.getTaskSnapshot());
-                    return ui.showAdded(newTask, tasks.getTaskCount());
-                case BYE:
-                    throw new IllegalStateException("The bye command should exit before dispatch.");
-                default:
-                    throw new IllegalStateException("This should not be reachable");
-            }
+            return executeCommand(parsedCommand);
         } catch (PandaException exception) {
             return ui.showError(exception);
         }
+    }
+
+    /**
+     * Executes a parsed non-exit command and returns its user-facing response.
+     *
+     * @param parsedCommand the command and its applicable argument.
+     * @return the response produced by the command.
+     * @throws PandaException if the command cannot be completed.
+     */
+    private String executeCommand(Parser.ParsedCommand parsedCommand) throws PandaException {
+        switch (parsedCommand.command()) {
+            case LIST:
+                List<TaskList.NumberedTask> displayedTasks =
+                        parsedCommand.filterDate() == null
+                                ? tasks.getTasks()
+                                : tasks.getTasksOn(parsedCommand.filterDate());
+                return ui.showTaskList(displayedTasks);
+            case FIND:
+                List<TaskList.NumberedTask> matchingTasks =
+                        tasks.getTasksMatching(parsedCommand.searchTerm());
+                return ui.showMatchingTaskList(matchingTasks);
+            case MARK:
+                return markTask(parsedCommand.taskNumber());
+            case UNMARK:
+                return unmarkTask(parsedCommand.taskNumber());
+            case DELETE:
+                return deleteTask(parsedCommand.taskNumber());
+            case EVENT, DEADLINE, TODO:
+                return addTask(parsedCommand.task());
+            case BYE:
+                throw new IllegalStateException("The bye command should exit before dispatch.");
+            default:
+                throw new IllegalStateException("This should not be reachable");
+        }
+    }
+
+    private String markTask(int taskNumber)
+            throws InvalidTaskNumberException, DataSavingException {
+        Task markedTask = tasks.mark(taskNumber);
+        String response = ui.showMarked(markedTask);
+        saveTasks();
+        return response;
+    }
+
+    private String unmarkTask(int taskNumber)
+            throws InvalidTaskNumberException, DataSavingException {
+        Task unmarkedTask = tasks.unmark(taskNumber);
+        String response = ui.showUnmarked(unmarkedTask);
+        saveTasks();
+        return response;
+    }
+
+    private String deleteTask(int taskNumber)
+            throws InvalidTaskNumberException, DataSavingException {
+        Task removedTask = tasks.delete(taskNumber);
+        String response = ui.showDeleted(removedTask, tasks.getTaskCount());
+        saveTasks();
+        return response;
+    }
+
+    private String addTask(Task task) throws DataSavingException {
+        tasks.add(task);
+        String response = ui.showAdded(task, tasks.getTaskCount());
+        saveTasks();
+        return response;
+    }
+
+    /**
+     * Saves the current task-list state.
+     *
+     * @throws DataSavingException if the task list cannot be saved.
+     */
+    private void saveTasks() throws DataSavingException {
+        storage.save(tasks.getTaskSnapshot());
     }
 
     /**
@@ -141,52 +184,7 @@ public class Panda {
                 break;
             }
             ui.showDivider();
-            try {
-                Parser.ParsedCommand parsedCommand = parser.parse(message);
-                switch (parsedCommand.command()) {
-                    case LIST:
-                        List<TaskList.NumberedTask> displayedTasks =
-                                parsedCommand.filterDate() == null
-                                        ? tasks.getTasks()
-                                        : tasks.getTasksOn(parsedCommand.filterDate());
-                        ui.showTaskList(displayedTasks);
-                        break;
-                    case FIND:
-                        List<TaskList.NumberedTask> matchingTasks =
-                                tasks.getTasksMatching(parsedCommand.searchTerm());
-                        ui.showMatchingTaskList(matchingTasks);
-                        break;
-                    case MARK:
-                        Task markedTask = tasks.mark(parsedCommand.taskNumber());
-                        ui.showMarked(markedTask);
-                        storage.save(tasks.getTaskSnapshot());
-                        break;
-                    case UNMARK:
-                        Task unmarkedTask = tasks.unmark(parsedCommand.taskNumber());
-                        ui.showUnmarked(unmarkedTask);
-                        storage.save(tasks.getTaskSnapshot());
-                        break;
-                    case DELETE:
-                        Task removedTask = tasks.delete(parsedCommand.taskNumber());
-                        ui.showDeleted(removedTask, tasks.getTaskCount());
-                        storage.save(tasks.getTaskSnapshot());
-                        break;
-                    case EVENT, DEADLINE, TODO:
-                        Task newTask = parsedCommand.task();
-                        tasks.add(newTask);
-                        ui.showAdded(newTask, tasks.getTaskCount());
-                        storage.save(tasks.getTaskSnapshot());
-                        break;
-                    case BYE:
-                        throw new IllegalStateException("The bye command should exit before dispatch.");
-
-                    default:
-                        throw new IllegalStateException("This should not be reachable");
-                }
-            } catch (PandaException exception) {
-                // Show expected input errors and continue accepting commands.
-                ui.showError(exception);
-            }
+            getResponse(message);
             ui.showDivider();
         }
         ui.showGoodbye();
