@@ -23,6 +23,9 @@ public enum Command {
     /** Marks a task as unfinished. */
     UNMARK("unmark", true),
 
+    /** Changes the name of an existing task. */
+    UPDATE("update", true),
+
     /** Removes a task from the task list. */
     DELETE("delete", true),
 

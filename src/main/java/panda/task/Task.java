@@ -24,7 +24,7 @@ public abstract class Task {
                     .withResolverStyle(ResolverStyle.STRICT);
     private static final DateTimeFormatter DISPLAY_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("MMM dd uuuu HH:mm", Locale.ENGLISH);
-    private final String name;
+    private String name;
     private TaskStatus status;
 
 
@@ -45,6 +45,17 @@ public abstract class Task {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Changes this task's name.
+     *
+     * @param updatedName the validated replacement name.
+     */
+    public void rename(String updatedName) {
+        assert updatedName != null && !updatedName.isBlank()
+                : "A task name must not be blank.";
+        name = updatedName;
     }
 
     /**

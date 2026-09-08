@@ -14,6 +14,7 @@ import panda.exception.EmptySearchTermException;
 import panda.exception.InvalidCommandException;
 import panda.exception.InvalidDateException;
 import panda.exception.InvalidTaskNumberException;
+import panda.exception.InvalidUpdateException;
 import panda.exception.MissingDateTimeException;
 import panda.exception.PandaException;
 import panda.task.Deadline;
@@ -49,6 +50,19 @@ class ParserTest {
         assertEquals(15, unmark.taskNumber());
         assertEquals(Command.DELETE, delete.command());
         assertEquals(1, delete.taskNumber());
+    }
+
+    @Test
+    void parse_updateNameCommand_returnsTaskNumberAndUpdatedName() throws PandaException {
+        Parser.ParsedCommand result = parser.parse(
+                "update 2 /name discuss report /by Friday");
+
+        assertEquals(Command.UPDATE, result.command());
+        assertEquals(2, result.taskNumber());
+        assertEquals("discuss report /by Friday", result.updatedName());
+        assertNull(result.task());
+        assertNull(result.filterDate());
+        assertNull(result.searchTerm());
     }
 
     @Test
@@ -98,6 +112,10 @@ class ParserTest {
         assertThrows(EmptyDescriptionException.class, () -> parser.parse("todo"));
         assertThrows(EmptySearchTermException.class, () -> parser.parse("find"));
         assertThrows(InvalidTaskNumberException.class, () -> parser.parse("mark bamboo"));
+        assertThrows(InvalidTaskNumberException.class, () -> parser.parse("update bamboo /name book"));
+        assertThrows(InvalidUpdateException.class, () -> parser.parse("update 1"));
+        assertThrows(InvalidUpdateException.class, () -> parser.parse("update 1 /name"));
+        assertThrows(InvalidUpdateException.class, () -> parser.parse("update 1 /by tomorrow"));
         assertThrows(InvalidDateException.class, () -> parser.parse("list 2025-02-29"));
         assertThrows(MissingDateTimeException.class, () ->
                 parser.parse("deadline submit report")

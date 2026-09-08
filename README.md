@@ -16,6 +16,16 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
 1. After that, locate the `src/main/java/panda/Panda.java` file, right-click it, and choose `Run Panda.main()` (if the code editor is showing compile errors, try restarting the IDE).
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
 
+## Updating task names
+
+Change the name of any existing task without changing its type, completion status, timing, or position:
+
+```text
+update <task number> /name <new name>
+```
+
+For example, `update 2 /name submit final report` changes the name of task 2. The task number refers to its position in the complete task list.
+
 ## AI assistance
 
 OpenAI Codex was used as a coding assistant during the development of this project. Its contributions

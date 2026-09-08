@@ -6,6 +6,7 @@ import panda.exception.EmptyDescriptionException;
 import panda.exception.EmptySearchTermException;
 import panda.exception.InvalidDateException;
 import panda.exception.InvalidTaskNumberException;
+import panda.exception.InvalidUpdateException;
 import panda.exception.MissingDateTimeException;
 import panda.exception.PandaException;
 import panda.task.Deadline;
@@ -54,6 +55,8 @@ public class Parser {
                 return parseFind(message, command);
             case MARK, UNMARK, DELETE:
                 return parseTaskNumber(message, command);
+            case UPDATE:
+                return parseUpdate(message, command);
             case TODO:
                 return parseTodo(message, command);
             case DEADLINE:
@@ -100,6 +103,43 @@ public class Parser {
         } catch (NumberFormatException exception) {
             throw new InvalidTaskNumberException(command.getKeyword());
         }
+    }
+
+    /**
+     * Parses the task number and replacement name used by an update command.
+     */
+    private ParsedCommand parseUpdate(String message, Command command)
+            throws InvalidTaskNumberException, InvalidUpdateException {
+        String details = getArguments(message, command);
+        int firstSpaceIndex = details.indexOf(' ');
+        if (firstSpaceIndex < 0) {
+            try {
+                Integer.parseInt(details);
+            } catch (NumberFormatException exception) {
+                throw new InvalidTaskNumberException(command.getKeyword());
+            }
+            throw new InvalidUpdateException();
+        }
+
+        String taskNumberText = details.substring(0, firstSpaceIndex);
+        int taskNumber;
+        try {
+            taskNumber = Integer.parseInt(taskNumberText);
+        } catch (NumberFormatException exception) {
+            throw new InvalidTaskNumberException(command.getKeyword());
+        }
+
+        String updateDetails = details.substring(firstSpaceIndex).trim();
+        String namePrefix = "/name ";
+        if (!updateDetails.startsWith(namePrefix)) {
+            throw new InvalidUpdateException();
+        }
+
+        String updatedName = updateDetails.substring(namePrefix.length()).trim();
+        if (updatedName.isBlank()) {
+            throw new InvalidUpdateException();
+        }
+        return ParsedCommand.createWithUpdatedName(command, taskNumber, updatedName);
     }
 
     /**
@@ -198,19 +238,20 @@ public class Parser {
      *
      * @param command the recognized command type.
      * @param task a parsed task for task-creation commands.
-     * @param taskNumber a number for mark, unmark, or delete.
+     * @param taskNumber a number for a command that targets an existing task.
      * @param filterDate an optional date supplied to list.
      * @param searchTerm a keyword supplied to find.
+     * @param updatedName a replacement name supplied to update.
      */
     public record ParsedCommand(Command command, Task task, Integer taskNumber,
-            LocalDate filterDate, String searchTerm) {
+            LocalDate filterDate, String searchTerm, String updatedName) {
         /**
          * Creates a parsed command without an argument.
          */
         private static ParsedCommand createWithoutArgument(Command command) {
             assert command == Command.BYE
                     : "Only the bye command may have no argument.";
-            return new ParsedCommand(command, null, null, null, null);
+            return new ParsedCommand(command, null, null, null, null, null);
         }
 
         /**
@@ -223,7 +264,7 @@ public class Parser {
                     : "Only task-creation commands may contain a task.";
             assert task != null
                     : "A task-creation command must contain a task.";
-            return new ParsedCommand(command, task, null, null, null);
+            return new ParsedCommand(command, task, null, null, null, null);
         }
 
         /**
@@ -234,7 +275,19 @@ public class Parser {
                     || command == Command.UNMARK
                     || command == Command.DELETE
                     : "Only numbered commands may contain a task number.";
-            return new ParsedCommand(command, null, taskNumber, null, null);
+            return new ParsedCommand(command, null, taskNumber, null, null, null);
+        }
+
+        /**
+         * Creates a parsed command that changes one task's name.
+         */
+        private static ParsedCommand createWithUpdatedName(
+                Command command, int taskNumber, String updatedName) {
+            assert command == Command.UPDATE
+                    : "Only the update command may contain an updated name.";
+            assert updatedName != null && !updatedName.isBlank()
+                    : "An update command must contain a non-blank name.";
+            return new ParsedCommand(command, null, taskNumber, null, null, updatedName);
         }
 
         /**
@@ -243,7 +296,7 @@ public class Parser {
         private static ParsedCommand createWithFilterDate(Command command, LocalDate filterDate) {
             assert command == Command.LIST
                     : "Only the list command may contain a date filter.";
-            return new ParsedCommand(command, null, null, filterDate, null);
+            return new ParsedCommand(command, null, null, filterDate, null, null);
         }
 
         /**
@@ -254,7 +307,7 @@ public class Parser {
                     : "Only the find command may contain a search term.";
             assert searchTerm != null && !searchTerm.isBlank()
                     : "A find command must contain a search term.";
-            return new ParsedCommand(command, null, null, null, searchTerm);
+            return new ParsedCommand(command, null, null, null, searchTerm, null);
         }
     }
 }

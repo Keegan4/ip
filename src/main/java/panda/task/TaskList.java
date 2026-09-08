@@ -67,6 +67,21 @@ public class TaskList {
     }
 
     /**
+     * Changes the name of the identified task.
+     *
+     * @param taskNumber the one-based task number.
+     * @param updatedName the validated replacement name.
+     * @return the renamed task.
+     * @throws InvalidTaskNumberException if no task has that number.
+     */
+    public Task rename(int taskNumber, String updatedName)
+            throws InvalidTaskNumberException {
+        Task task = getTask(taskNumber);
+        task.rename(updatedName);
+        return task;
+    }
+
+    /**
      * Removes the identified task from the list.
      *
      * @param taskNumber the one-based task number.

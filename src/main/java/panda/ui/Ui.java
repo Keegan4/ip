@@ -132,6 +132,22 @@ public class Ui {
     }
 
     /**
+     * Displays confirmation that a task's name was changed.
+     *
+     * @param task the updated task.
+     * @return the formatted update confirmation.
+     */
+    public String showUpdated(Task task) {
+        String status = task.isDone() ? "X" : " ";
+        String response = formatLines(
+                "Got it. I've updated this task:",
+                String.format("  [%s][%s] %s", task.getType().getMarker(), status,
+                        task.getDisplayText()));
+        System.out.print(response);
+        return response;
+    }
+
+    /**
      * Displays confirmation that a task was removed.
      *
      * @param task the removed task.

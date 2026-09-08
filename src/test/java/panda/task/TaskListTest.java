@@ -3,6 +3,7 @@ package panda.task;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -90,5 +91,23 @@ class TaskListTest {
 
         assertThrows(InvalidTaskNumberException.class, () -> tasks.delete(0));
         assertThrows(InvalidTaskNumberException.class, () -> tasks.delete(2));
+    }
+
+    @Test
+    void rename_completedDatedTask_preservesIdentityStatusTimingAndPosition()
+            throws InvalidDateException, InvalidTaskNumberException {
+        Todo first = new Todo("read book");
+        Deadline deadline = new Deadline("submit report", "2026-09-13 10:00");
+        deadline.mark();
+        TaskList tasks = new TaskList(List.of(first, deadline));
+
+        Task renamedTask = tasks.rename(2, "submit final report");
+
+        assertSame(deadline, renamedTask);
+        assertEquals("submit final report", renamedTask.getName());
+        assertEquals("submit final report (by: Sep 13 2026 10:00)",
+                renamedTask.getDisplayText());
+        assertTrue(renamedTask.isDone());
+        assertEquals(2, tasks.getTasks().get(1).number());
     }
 }
