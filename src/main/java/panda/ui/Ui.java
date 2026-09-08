@@ -141,7 +141,7 @@ public class Ui {
         String status = task.isDone() ? "X" : " ";
         String response = formatLines(
                 "Noted. I've removed this task:",
-                String.format("  [%s][%s] %s", task.getTypeMarker(), status,
+                String.format("  [%s][%s] %s", task.getType().getMarker(), status,
                         task.getDisplayText()),
                 formatTaskCount(remainingTaskCount));
         System.out.print(response);
@@ -157,7 +157,7 @@ public class Ui {
     public String showAdded(Task task, int taskCount) {
         String response = formatLines(
                 "Got it. I've added this task:",
-                String.format("  [%s][ ] %s", task.getTypeMarker(), task.getDisplayText()),
+                String.format("  [%s][ ] %s", task.getType().getMarker(), task.getDisplayText()),
                 formatTaskCount(taskCount));
         System.out.print(response);
         return response;
@@ -218,7 +218,7 @@ public class Ui {
         Task task = numberedTask.task();
         String status = task.isDone() ? "X" : " ";
         return String.format("%d.[%s][%s] %s", numberedTask.number(),
-                task.getTypeMarker(), status, task.getDisplayText());
+                task.getType().getMarker(), status, task.getDisplayText());
     }
 
     /**
