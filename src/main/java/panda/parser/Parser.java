@@ -170,6 +170,8 @@ public class Parser {
      * Returns the trimmed portion of a message after its command keyword.
      */
     private String getArguments(String message, Command command) {
+        assert command.matches(message)
+                : "Message must match the command before arguments are extracted.";
         return message.substring(command.getKeyword().length()).trim();
     }
 
@@ -200,6 +202,8 @@ public class Parser {
          * Creates a parsed command without an argument.
          */
         private static ParsedCommand createWithoutArgument(Command command) {
+            assert command == Command.BYE
+                    : "Only the bye command may have no argument.";
             return new ParsedCommand(command, null, null, null, null);
         }
 
@@ -207,6 +211,12 @@ public class Parser {
          * Creates a parsed task-creation command.
          */
         private static ParsedCommand createWithTask(Command command, Task task) {
+            assert command == Command.TODO
+                    || command == Command.DEADLINE
+                    || command == Command.EVENT
+                    : "Only task-creation commands may contain a task.";
+            assert task != null
+                    : "A task-creation command must contain a task.";
             return new ParsedCommand(command, task, null, null, null);
         }
 
@@ -214,6 +224,10 @@ public class Parser {
          * Creates a parsed numbered command.
          */
         private static ParsedCommand createWithTaskNumber(Command command, int taskNumber) {
+            assert command == Command.MARK
+                    || command == Command.UNMARK
+                    || command == Command.DELETE
+                    : "Only numbered commands may contain a task number.";
             return new ParsedCommand(command, null, taskNumber, null, null);
         }
 
@@ -221,6 +235,8 @@ public class Parser {
          * Creates a parsed list command with an optional date filter.
          */
         private static ParsedCommand createWithFilterDate(Command command, LocalDate filterDate) {
+            assert command == Command.LIST
+                    : "Only the list command may contain a date filter.";
             return new ParsedCommand(command, null, null, filterDate, null);
         }
 
@@ -228,6 +244,10 @@ public class Parser {
          * Creates a parsed find command with its search term.
          */
         private static ParsedCommand withSearchTerm(Command command, String searchTerm) {
+            assert command == Command.FIND
+                    : "Only the find command may contain a search term.";
+            assert searchTerm != null && !searchTerm.isBlank()
+                    : "A find command must contain a search term.";
             return new ParsedCommand(command, null, null, null, searchTerm);
         }
     }

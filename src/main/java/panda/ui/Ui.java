@@ -11,6 +11,8 @@ import panda.task.TaskList;
  * Handles all command-line input and output for Panda.
  * Keeping presentation here allows the application coordinator to focus on
  * command execution instead of console formatting details.
+ * <p>
+ * Each method returns a string that the gui is able to display to the user
  */
 public class Ui {
     private static final String DIVIDER =
