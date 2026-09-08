@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 import panda.exception.DataLoadingException;
 import panda.exception.DataSavingException;
@@ -77,9 +76,13 @@ public class Storage {
      * @throws DataSavingException if the destination cannot be created or written.
      */
     public void save(List<Task> tasks) throws DataSavingException {
-        String storedData = tasks.stream()
-                .map(Task::toDataString)
-                .collect(Collectors.joining(System.lineSeparator()));
+        StringBuilder storedData = new StringBuilder();
+        for (int i = 0; i < tasks.size(); i++) {
+            if (i > 0) {
+                storedData.append(System.lineSeparator());
+            }
+            storedData.append(tasks.get(i).toDataString());
+        }
 
         try {
             Path parentDirectory = dataFile.getParent();
