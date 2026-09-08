@@ -42,6 +42,11 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     public void initialize() {
+        assert scrollPane != null : "fx:id=\"scrollPane\" was not injected.";
+        assert dialogContainer != null : "fx:id=\"dialogContainer\" was not injected.";
+        assert userInput != null : "fx:id=\"userInput\" was not injected.";
+        assert sendButton != null : "fx:id=\"sendButton\" was not injected.";
+
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
         dialogContainer.getChildren().add(
                 DialogBox.getPandaDialog(ui.showWelcome(), pandaImage));
@@ -61,6 +66,8 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     private void handleUserInput() {
+        assert panda != null : "Panda must be supplied before user input is handled.";
+
         String input = userInput.getText();
         boolean shouldExit = panda.isExitCommand(input);
         String response = panda.getResponse(input);
