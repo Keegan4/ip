@@ -109,6 +109,16 @@ public class Storage {
             throw new DataLoadingException(lineNumber, "no task description.");
         }
 
+        Task task = createStoredTask(fields, lineNumber);
+        restoreCompletionStatus(task, fields[1], lineNumber);
+        return task;
+    }
+
+    /**
+     * Validates type-specific fields and creates the represented task subtype.
+     */
+    private Task createStoredTask(String[] fields, int lineNumber)
+            throws DataLoadingException, InvalidDateException {
         Task task;
         switch (fields[0]) {
             case "T":
@@ -130,14 +140,20 @@ public class Storage {
                 throw new DataLoadingException(lineNumber,
                         "an invalid task type; expected T, D, or E.");
         }
+        return task;
+    }
 
-        if (fields[1].equals("1")) {
+    /**
+     * Restores a task's completion state from its stored status field.
+     */
+    private void restoreCompletionStatus(Task task, String status, int lineNumber)
+            throws DataLoadingException {
+        if (status.equals("1")) {
             task.mark();
-        } else if (!fields[1].equals("0")) {
+        } else if (!status.equals("0")) {
             throw new DataLoadingException(lineNumber,
                     "an invalid completion status; expected 0 or 1.");
         }
-        return task;
     }
 
     /**
