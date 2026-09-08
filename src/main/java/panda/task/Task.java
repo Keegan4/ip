@@ -25,7 +25,7 @@ public abstract class Task {
     private static final DateTimeFormatter DISPLAY_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("MMM dd uuuu HH:mm", Locale.ENGLISH);
     private final String name;
-    private boolean isDone;
+    private TaskStatus status;
 
 
     /**
@@ -35,7 +35,7 @@ public abstract class Task {
      */
     public Task(String name) {
         this.name = name;
-        this.isDone = false;
+        status = TaskStatus.NOT_DONE;
     }
 
     /**
@@ -53,31 +53,32 @@ public abstract class Task {
      * @return true when the task is done.
      */
     public boolean isDone() {
-        return isDone;
+        return status == TaskStatus.DONE;
     }
 
     /**
      * Marks this task as done.
      */
     public void mark() {
-        isDone = true;
+        status = TaskStatus.DONE;
     }
 
     /**
      * Marks this task as unfinished.
      */
     public void unmark() {
-        isDone = false;
+        status = TaskStatus.NOT_DONE;
     }
 
     /**
-     * Returns the letter used to identify this kind of task in the list.
+     * Returns this task's type.
      *
-     * Lets each task subtype supply its own display marker.
+     * Lets each task subtype supply its display and storage marker through
+     * the corresponding enum value.
      *
-     * @return the task type marker.
+     * @return the task type.
      */
-    public abstract String getTypeMarker();
+    public abstract TaskType getType();
 
     /**
      * Returns the task text to show in confirmations and task lists.
@@ -111,8 +112,8 @@ public abstract class Task {
      * @return the pipe-separated representation of this task.
      */
     public String toDataString() {
-        String status = isDone ? "1" : "0";
-        return getTypeMarker() + " | " + status + " | " + escapeDataField(name);
+        return getType().getMarker() + " | " + status.getStorageValue()
+                + " | " + escapeDataField(name);
     }
 
     /**

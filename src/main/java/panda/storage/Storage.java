@@ -15,6 +15,8 @@ import panda.exception.PandaException;
 import panda.task.Deadline;
 import panda.task.Event;
 import panda.task.Task;
+import panda.task.TaskStatus;
+import panda.task.TaskType;
 import panda.task.Todo;
 
 /**
@@ -119,26 +121,33 @@ public class Storage {
      */
     private Task createStoredTask(String[] fields, int lineNumber)
             throws DataLoadingException, InvalidDateException {
+        TaskType taskType;
+        try {
+            taskType = TaskType.fromMarker(fields[0]);
+        } catch (IllegalArgumentException exception) {
+            throw new DataLoadingException(lineNumber,
+                    "an invalid task type; expected T, D, or E.");
+        }
+
         Task task;
-        switch (fields[0]) {
-            case "T":
+        switch (taskType) {
+            case TODO:
                 ensureStoredFieldCount(fields, 3, lineNumber, "todo");
                 task = new Todo(fields[2]);
                 break;
-            case "D":
+            case DEADLINE:
                 ensureStoredFieldCount(fields, 4, lineNumber, "deadline");
                 ensureStoredValue(fields[3], lineNumber, "no deadline time.");
                 task = new Deadline(fields[2], fields[3]);
                 break;
-            case "E":
+            case EVENT:
                 ensureStoredFieldCount(fields, 5, lineNumber, "event");
                 ensureStoredValue(fields[3], lineNumber, "no event start time.");
                 ensureStoredValue(fields[4], lineNumber, "no event end time.");
                 task = new Event(fields[2], fields[3], fields[4]);
                 break;
             default:
-                throw new DataLoadingException(lineNumber,
-                        "an invalid task type; expected T, D, or E.");
+                throw new IllegalStateException("Unsupported task type: " + taskType);
         }
         return task;
     }
@@ -148,11 +157,22 @@ public class Storage {
      */
     private void restoreCompletionStatus(Task task, String status, int lineNumber)
             throws DataLoadingException {
-        if (status.equals("1")) {
-            task.mark();
-        } else if (!status.equals("0")) {
+        TaskStatus taskStatus;
+        try {
+            taskStatus = TaskStatus.fromStorageValue(status);
+        } catch (IllegalArgumentException exception) {
             throw new DataLoadingException(lineNumber,
                     "an invalid completion status; expected 0 or 1.");
+        }
+
+        switch (taskStatus) {
+            case DONE:
+                task.mark();
+                break;
+            case NOT_DONE:
+                break;
+            default:
+                throw new IllegalStateException("Unsupported task status: " + taskStatus);
         }
     }
 

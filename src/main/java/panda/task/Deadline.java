@@ -27,13 +27,13 @@ public class Deadline extends Task {
     }
 
     /**
-     * Returns the list marker for a deadline.
+     * Returns the deadline task type.
      *
-     * @return the letter D.
+     * @return the deadline task type.
      */
     @Override
-    public String getTypeMarker() {
-        return "D";
+    public TaskType getType() {
+        return TaskType.DEADLINE;
     }
 
     /**

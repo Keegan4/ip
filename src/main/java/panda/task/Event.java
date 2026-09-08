@@ -31,13 +31,13 @@ public class Event extends Task {
     }
 
     /**
-     * Returns the list marker for an event.
+     * Returns the event task type.
      *
-     * @return the letter E.
+     * @return the event task type.
      */
     @Override
-    public String getTypeMarker() {
-        return "E";
+    public TaskType getType() {
+        return TaskType.EVENT;
     }
 
     /**

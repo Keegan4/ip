@@ -17,12 +17,12 @@ public class Todo extends Task {
     }
 
     /**
-     * Returns the list marker for a to-do.
+     * Returns the to-do task type.
      *
-     * @return the letter T.
+     * @return the to-do task type.
      */
     @Override
-    public String getTypeMarker() {
-        return "T";
+    public TaskType getType() {
+        return TaskType.TODO;
     }
 }
