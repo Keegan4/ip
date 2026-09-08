@@ -25,7 +25,7 @@ public abstract class Task {
     private static final DateTimeFormatter DISPLAY_DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("MMM dd uuuu HH:mm", Locale.ENGLISH);
     private final String name;
-    private boolean isDone;
+    private TaskStatus status;
 
 
     /**
@@ -35,7 +35,7 @@ public abstract class Task {
      */
     public Task(String name) {
         this.name = name;
-        this.isDone = false;
+        status = TaskStatus.NOT_DONE;
     }
 
     /**
@@ -53,31 +53,32 @@ public abstract class Task {
      * @return true when the task is done.
      */
     public boolean isDone() {
-        return isDone;
+        return status == TaskStatus.DONE;
     }
 
     /**
      * Marks this task as done.
      */
     public void mark() {
-        isDone = true;
+        status = TaskStatus.DONE;
     }
 
     /**
      * Marks this task as unfinished.
      */
     public void unmark() {
-        isDone = false;
+        status = TaskStatus.NOT_DONE;
     }
 
     /**
-     * Returns the letter used to identify this kind of task in the list.
+     * Returns this task's type.
      *
-     * Lets each task subtype supply its own display marker.
+     * Lets each task subtype supply its display and storage marker through
+     * the corresponding enum value.
      *
-     * @return the task type marker.
+     * @return the task type.
      */
-    public abstract String getTypeMarker();
+    public abstract TaskType getType();
 
     /**
      * Returns the task text to show in confirmations and task lists.
@@ -111,8 +112,8 @@ public abstract class Task {
      * @return the pipe-separated representation of this task.
      */
     public String toDataString() {
-        String status = isDone ? "1" : "0";
-        return getTypeMarker() + " | " + status + " | " + escapeDataField(name);
+        return getType().getMarker() + " | " + status.getStorageValue()
+                + " | " + escapeDataField(name);
     }
 
     /**
@@ -133,7 +134,7 @@ public abstract class Task {
      * @return the parsed date and time.
      * @throws InvalidDateException if the text is malformed or contains an invalid value.
      */
-    protected static LocalDateTime processDate(String dateTimeText)
+    protected static LocalDateTime parseDateTime(String dateTimeText)
             throws InvalidDateException {
         try {
             return LocalDateTime.parse(dateTimeText, INPUT_DATE_TIME_FORMATTER);
@@ -149,7 +150,7 @@ public abstract class Task {
      * @return the parsed date.
      * @throws InvalidDateException if the date is malformed or impossible.
      */
-    public static LocalDate processListDate(String dateText)
+    public static LocalDate parseListDate(String dateText)
             throws InvalidDateException {
         try {
             return LocalDate.parse(dateText, INPUT_DATE_FORMATTER);
@@ -164,7 +165,7 @@ public abstract class Task {
      * @param dateTime the value to format.
      * @return the value in {@code MMM dd uuuu HH:mm} format.
      */
-    protected static String formatDateForDisplay(LocalDateTime dateTime) {
+    protected static String formatDateTimeForDisplay(LocalDateTime dateTime) {
         return dateTime.format(DISPLAY_DATE_TIME_FORMATTER);
     }
 
@@ -174,7 +175,7 @@ public abstract class Task {
      * @param dateTime the value to format.
      * @return the value in {@code uuuu-MM-dd HH:mm} format.
      */
-    protected static String formatDateForStorage(LocalDateTime dateTime) {
+    protected static String formatDateTimeForStorage(LocalDateTime dateTime) {
         return dateTime.format(INPUT_DATE_TIME_FORMATTER);
     }
 }

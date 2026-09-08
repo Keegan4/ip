@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 import panda.exception.DataLoadingException;
 import panda.exception.DataSavingException;
@@ -16,6 +15,8 @@ import panda.exception.PandaException;
 import panda.task.Deadline;
 import panda.task.Event;
 import panda.task.Task;
+import panda.task.TaskStatus;
+import panda.task.TaskType;
 import panda.task.Todo;
 
 /**
@@ -75,9 +76,13 @@ public class Storage {
      * @throws DataSavingException if the destination cannot be created or written.
      */
     public void save(List<Task> tasks) throws DataSavingException {
-        String storedData = tasks.stream()
-                .map(Task::toDataString)
-                .collect(Collectors.joining(System.lineSeparator()));
+        StringBuilder storedData = new StringBuilder();
+        for (int i = 0; i < tasks.size(); i++) {
+            if (i > 0) {
+                storedData.append(System.lineSeparator());
+            }
+            storedData.append(tasks.get(i).toDataString());
+        }
 
         try {
             Path parentDirectory = dataFile.getParent();
@@ -106,35 +111,69 @@ public class Storage {
             throw new DataLoadingException(lineNumber, "no task description.");
         }
 
+        Task task = createStoredTask(fields, lineNumber);
+        restoreCompletionStatus(task, fields[1], lineNumber);
+        return task;
+    }
+
+    /**
+     * Validates type-specific fields and creates the represented task subtype.
+     */
+    private Task createStoredTask(String[] fields, int lineNumber)
+            throws DataLoadingException, InvalidDateException {
+        TaskType taskType;
+        try {
+            taskType = TaskType.fromMarker(fields[0]);
+        } catch (IllegalArgumentException exception) {
+            throw new DataLoadingException(lineNumber,
+                    "an invalid task type; expected T, D, or E.");
+        }
+
         Task task;
-        switch (fields[0]) {
-            case "T":
+        switch (taskType) {
+            case TODO:
                 ensureStoredFieldCount(fields, 3, lineNumber, "todo");
                 task = new Todo(fields[2]);
                 break;
-            case "D":
+            case DEADLINE:
                 ensureStoredFieldCount(fields, 4, lineNumber, "deadline");
                 ensureStoredValue(fields[3], lineNumber, "no deadline time.");
                 task = new Deadline(fields[2], fields[3]);
                 break;
-            case "E":
+            case EVENT:
                 ensureStoredFieldCount(fields, 5, lineNumber, "event");
                 ensureStoredValue(fields[3], lineNumber, "no event start time.");
                 ensureStoredValue(fields[4], lineNumber, "no event end time.");
                 task = new Event(fields[2], fields[3], fields[4]);
                 break;
             default:
-                throw new DataLoadingException(lineNumber,
-                        "an invalid task type; expected T, D, or E.");
+                throw new IllegalStateException("Unsupported task type: " + taskType);
         }
+        return task;
+    }
 
-        if (fields[1].equals("1")) {
-            task.mark();
-        } else if (!fields[1].equals("0")) {
+    /**
+     * Restores a task's completion state from its stored status field.
+     */
+    private void restoreCompletionStatus(Task task, String status, int lineNumber)
+            throws DataLoadingException {
+        TaskStatus taskStatus;
+        try {
+            taskStatus = TaskStatus.fromStorageValue(status);
+        } catch (IllegalArgumentException exception) {
             throw new DataLoadingException(lineNumber,
                     "an invalid completion status; expected 0 or 1.");
         }
-        return task;
+
+        switch (taskStatus) {
+            case DONE:
+                task.mark();
+                break;
+            case NOT_DONE:
+                break;
+            default:
+                throw new IllegalStateException("Unsupported task status: " + taskStatus);
+        }
     }
 
     /**

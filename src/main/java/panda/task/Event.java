@@ -12,31 +12,32 @@ import panda.exception.InvalidDateException;
  * stored event has valid start and end values.
  */
 public class Event extends Task {
-    private final LocalDateTime from;
-    private final LocalDateTime to;
+    private final LocalDateTime startDateTime;
+    private final LocalDateTime endDateTime;
 
     /**
      * Creates an unfinished event task.
      *
      * @param name the event description.
-     * @param from the supplied starting date and time.
-     * @param to the supplied ending date and time.
+     * @param startDateTimeText the supplied starting date and time.
+     * @param endDateTimeText the supplied ending date and time.
      * @throws InvalidDateException if either endpoint is not a valid date and time.
      */
-    public Event(String name, String from, String to) throws InvalidDateException {
+    public Event(String name, String startDateTimeText, String endDateTimeText)
+            throws InvalidDateException {
         super(name);
-        this.from = processDate(from);
-        this.to = processDate(to);
+        startDateTime = parseDateTime(startDateTimeText);
+        endDateTime = parseDateTime(endDateTimeText);
     }
 
     /**
-     * Returns the list marker for an event.
+     * Returns the event task type.
      *
-     * @return the letter E.
+     * @return the event task type.
      */
     @Override
-    public String getTypeMarker() {
-        return "E";
+    public TaskType getType() {
+        return TaskType.EVENT;
     }
 
     /**
@@ -46,8 +47,8 @@ public class Event extends Task {
      */
     @Override
     public String getDisplayText() {
-        return getName() + " (from: " + formatDateForDisplay(from)
-                + " to: " + formatDateForDisplay(to) + ")";
+        return getName() + " (from: " + formatDateTimeForDisplay(startDateTime)
+                + " to: " + formatDateTimeForDisplay(endDateTime) + ")";
     }
 
     /**
@@ -59,8 +60,8 @@ public class Event extends Task {
      */
     @Override
     public boolean occursOn(LocalDate date) {
-        LocalDate startDate = from.toLocalDate();
-        LocalDate endDate = to.toLocalDate();
+        LocalDate startDate = startDateTime.toLocalDate();
+        LocalDate endDate = endDateTime.toLocalDate();
         return !date.isBefore(startDate) && !date.isAfter(endDate);
     }
 
@@ -71,7 +72,8 @@ public class Event extends Task {
      */
     @Override
     public String toDataString() {
-        return super.toDataString() + " | " + escapeDataField(formatDateForStorage(from))
-                + " | " + escapeDataField(formatDateForStorage(to));
+        return super.toDataString() + " | "
+                + escapeDataField(formatDateTimeForStorage(startDateTime))
+                + " | " + escapeDataField(formatDateTimeForStorage(endDateTime));
     }
 }

@@ -84,7 +84,7 @@ public class Parser {
             throws InvalidDateException {
         String dateText = getArguments(message, command);
         LocalDate filterDate = dateText.isEmpty()
-                ? null : Task.processListDate(dateText);
+                ? null : Task.parseListDate(dateText);
         return ParsedCommand.createWithFilterDate(command, filterDate);
     }
 
@@ -124,17 +124,19 @@ public class Parser {
             throw new EmptyDescriptionException(command.getKeyword());
         }
 
-        String separator = details.contains(" /by ") ? " /by " : " by ";
-        int separatorIndex = details.indexOf(separator);
-        if (separatorIndex <= 0
-                || separatorIndex + separator.length() >= details.length()) {
+        String deadlineSeparator = details.contains(" /by ") ? " /by " : " by ";
+        int deadlineSeparatorIndex = details.indexOf(deadlineSeparator);
+        if (deadlineSeparatorIndex <= 0
+                || deadlineSeparatorIndex + deadlineSeparator.length() >= details.length()) {
             throw new MissingDateTimeException(
                     "deadline <description> /by <date or time>.");
         }
 
-        String description = details.substring(0, separatorIndex).trim();
-        String by = details.substring(separatorIndex + separator.length()).trim();
-        return ParsedCommand.createWithTask(command, new Deadline(description, by));
+        String description = details.substring(0, deadlineSeparatorIndex).trim();
+        String deadlineDateTimeText = details.substring(
+                deadlineSeparatorIndex + deadlineSeparator.length()).trim();
+        return ParsedCommand.createWithTask(
+                command, new Deadline(description, deadlineDateTimeText));
     }
 
     /**
@@ -149,21 +151,25 @@ public class Parser {
             throw new EmptyDescriptionException(command.getKeyword());
         }
 
-        String fromSeparator = details.contains(" /from ") ? " /from " : " from ";
-        String toSeparator = details.contains(" /to ") ? " /to " : " to ";
-        int fromIndex = details.indexOf(fromSeparator);
-        int toIndex = details.indexOf(toSeparator,
-                fromIndex < 0 ? 0 : fromIndex + fromSeparator.length());
-        if (fromIndex <= 0 || toIndex <= fromIndex + fromSeparator.length()
-                || toIndex + toSeparator.length() >= details.length()) {
+        String startSeparator = details.contains(" /from ") ? " /from " : " from ";
+        String endSeparator = details.contains(" /to ") ? " /to " : " to ";
+        int startSeparatorIndex = details.indexOf(startSeparator);
+        int endSeparatorIndex = details.indexOf(endSeparator,
+                startSeparatorIndex < 0 ? 0 : startSeparatorIndex + startSeparator.length());
+        if (startSeparatorIndex <= 0
+                || endSeparatorIndex <= startSeparatorIndex + startSeparator.length()
+                || endSeparatorIndex + endSeparator.length() >= details.length()) {
             throw new MissingDateTimeException(
                     "event <description> /from <start> /to <end>.");
         }
 
-        String description = details.substring(0, fromIndex).trim();
-        String from = details.substring(fromIndex + fromSeparator.length(), toIndex).trim();
-        String to = details.substring(toIndex + toSeparator.length()).trim();
-        return ParsedCommand.createWithTask(command, new Event(description, from, to));
+        String description = details.substring(0, startSeparatorIndex).trim();
+        String startDateTimeText = details.substring(
+                startSeparatorIndex + startSeparator.length(), endSeparatorIndex).trim();
+        String endDateTimeText = details.substring(
+                endSeparatorIndex + endSeparator.length()).trim();
+        return ParsedCommand.createWithTask(
+                command, new Event(description, startDateTimeText, endDateTimeText));
     }
 
     /**
