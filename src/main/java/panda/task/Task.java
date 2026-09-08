@@ -133,7 +133,7 @@ public abstract class Task {
      * @return the parsed date and time.
      * @throws InvalidDateException if the text is malformed or contains an invalid value.
      */
-    protected static LocalDateTime processDate(String dateTimeText)
+    protected static LocalDateTime parseDateTime(String dateTimeText)
             throws InvalidDateException {
         try {
             return LocalDateTime.parse(dateTimeText, INPUT_DATE_TIME_FORMATTER);
@@ -149,7 +149,7 @@ public abstract class Task {
      * @return the parsed date.
      * @throws InvalidDateException if the date is malformed or impossible.
      */
-    public static LocalDate processListDate(String dateText)
+    public static LocalDate parseListDate(String dateText)
             throws InvalidDateException {
         try {
             return LocalDate.parse(dateText, INPUT_DATE_FORMATTER);
@@ -164,7 +164,7 @@ public abstract class Task {
      * @param dateTime the value to format.
      * @return the value in {@code MMM dd uuuu HH:mm} format.
      */
-    protected static String formatDateForDisplay(LocalDateTime dateTime) {
+    protected static String formatDateTimeForDisplay(LocalDateTime dateTime) {
         return dateTime.format(DISPLAY_DATE_TIME_FORMATTER);
     }
 
@@ -174,7 +174,7 @@ public abstract class Task {
      * @param dateTime the value to format.
      * @return the value in {@code uuuu-MM-dd HH:mm} format.
      */
-    protected static String formatDateForStorage(LocalDateTime dateTime) {
+    protected static String formatDateTimeForStorage(LocalDateTime dateTime) {
         return dateTime.format(INPUT_DATE_TIME_FORMATTER);
     }
 }

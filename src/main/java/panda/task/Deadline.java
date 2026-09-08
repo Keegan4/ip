@@ -12,18 +12,18 @@ import panda.exception.InvalidDateException;
  * deadline has a valid date and time.
  */
 public class Deadline extends Task {
-    private final LocalDateTime by;
+    private final LocalDateTime deadlineDateTime;
 
     /**
      * Creates an unfinished deadline task.
      *
      * @param name the task description.
-     * @param by the date and time text supplied by the user.
-     * @throws InvalidDateException if {@code by} is not a valid date and time.
+     * @param deadlineDateTimeText the date and time text supplied by the user.
+     * @throws InvalidDateException if {@code deadlineDateTimeText} is not a valid date and time.
      */
-    public Deadline(String name, String by) throws InvalidDateException {
+    public Deadline(String name, String deadlineDateTimeText) throws InvalidDateException {
         super(name);
-        this.by = processDate(by);
+        deadlineDateTime = parseDateTime(deadlineDateTimeText);
     }
 
     /**
@@ -43,7 +43,7 @@ public class Deadline extends Task {
      */
     @Override
     public String getDisplayText() {
-        return getName() + " (by: " + formatDateForDisplay(by) + ")";
+        return getName() + " (by: " + formatDateTimeForDisplay(deadlineDateTime) + ")";
     }
 
     /**
@@ -54,7 +54,7 @@ public class Deadline extends Task {
      */
     @Override
     public boolean occursOn(LocalDate date) {
-        return by.toLocalDate().equals(date);
+        return deadlineDateTime.toLocalDate().equals(date);
     }
 
     /**
@@ -64,6 +64,7 @@ public class Deadline extends Task {
      */
     @Override
     public String toDataString() {
-        return super.toDataString() + " | " + escapeDataField(formatDateForStorage(by));
+        return super.toDataString() + " | "
+                + escapeDataField(formatDateTimeForStorage(deadlineDateTime));
     }
 }
