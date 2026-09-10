@@ -91,16 +91,32 @@ public class MainWindowTest {
                     Nice! I've marked this task as done:
                       [X] read book
                     """);
+            submitAndAssert(userInput, sendButton, dialogContainer,
+                    "update 1 /name read Java book", """
+                    Got it. I've updated this task:
+                      [T][X] read Java book
+                    """);
             submitAndAssert(userInput, sendButton, dialogContainer, "list", """
                     Here are the tasks in your list:
-                    1.[T][X] read book
+                    1.[T][X] read Java book
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer, "unknown", """
                     OOPS!!! I'm bamboo-zled; I don't know what that means :-(""");
             submitAndAssert(userInput, sendButton, dialogContainer, "delete 1", """
                     Noted. I've removed this task:
-                      [T][X] read book
+                      [T][X] read Java book
                     Now you have 0 tasks in the list.
+                    """);
+            submitAndAssert(userInput, sendButton, dialogContainer,
+                    "deadline submit report /by 2026-09-15 17:00", """
+                    Got it. I've added this task:
+                      [D][ ] submit report (by: Sep 15 2026 17:00)
+                    Now you have 1 task in the list.
+                    """);
+            submitAndAssert(userInput, sendButton, dialogContainer,
+                    "update 1 /by 2026-09-15 18:00", """
+                    Got it. I've updated this task:
+                      [D][ ] submit report (by: Sep 15 2026 18:00)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer, "bye",
                     "Bye. Hope to see you again soon!");

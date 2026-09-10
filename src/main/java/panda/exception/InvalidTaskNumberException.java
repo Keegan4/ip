@@ -1,7 +1,7 @@
 package panda.exception;
 
 /**
- * Signals that a mark, unmark, or delete command does not identify an existing task.
+ * Signals that a numbered command does not identify an existing task.
  *
  * Converts missing, non-numeric, and out-of-range task numbers
  * into clear user-facing errors.

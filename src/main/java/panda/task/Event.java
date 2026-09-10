@@ -12,8 +12,8 @@ import panda.exception.InvalidDateException;
  * stored event has valid start and end values.
  */
 public class Event extends Task {
-    private final LocalDateTime startDateTime;
-    private final LocalDateTime endDateTime;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
 
     /**
      * Creates an unfinished event task.
@@ -38,6 +38,23 @@ public class Event extends Task {
     @Override
     public TaskType getType() {
         return TaskType.EVENT;
+    }
+
+    /**
+     * Changes this event's complete time interval.
+     *
+     * Both values are parsed before either field is changed.
+     *
+     * @param updatedStartDateTimeText the replacement starting date and time.
+     * @param updatedEndDateTimeText the replacement ending date and time.
+     * @throws InvalidDateException if either replacement is not a valid date and time.
+     */
+    public void reschedule(String updatedStartDateTimeText,
+            String updatedEndDateTimeText) throws InvalidDateException {
+        LocalDateTime updatedStartDateTime = parseDateTime(updatedStartDateTimeText);
+        LocalDateTime updatedEndDateTime = parseDateTime(updatedEndDateTimeText);
+        startDateTime = updatedStartDateTime;
+        endDateTime = updatedEndDateTime;
     }
 
     /**

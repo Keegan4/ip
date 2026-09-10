@@ -12,7 +12,7 @@ import panda.exception.InvalidDateException;
  * deadline has a valid date and time.
  */
 public class Deadline extends Task {
-    private final LocalDateTime deadlineDateTime;
+    private LocalDateTime deadlineDateTime;
 
     /**
      * Creates an unfinished deadline task.
@@ -34,6 +34,17 @@ public class Deadline extends Task {
     @Override
     public TaskType getType() {
         return TaskType.DEADLINE;
+    }
+
+    /**
+     * Changes this task's deadline.
+     *
+     * @param updatedDateTimeText the validated replacement date and time text.
+     * @throws InvalidDateException if the replacement is not a valid date and time.
+     */
+    public void reschedule(String updatedDateTimeText) throws InvalidDateException {
+        LocalDateTime updatedDateTime = parseDateTime(updatedDateTimeText);
+        deadlineDateTime = updatedDateTime;
     }
 
     /**

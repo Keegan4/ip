@@ -13,8 +13,11 @@ This file lists all anticipated user-input errors in the current command-line in
 | `event` | `/from` or `/to` is malformed or is not a real date and time | `InvalidDateException` | `OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.` |
 | `list` | Optional date is malformed, impossible, or contains extra arguments | `InvalidDateException` | `OOPS!!! This panda needs a valid list date in yyyy-MM-dd format.` |
 | `find` | Search keyword is missing or blank | `EmptySearchTermException` | `OOPS!!! This panda needs a search keyword after find.` |
-| `mark`, `unmark`, or `delete` | Task number is missing or is not an integer | `InvalidTaskNumberException` | `OOPS!!! This panda needs a valid task number after <command>.` |
-| `mark`, `unmark`, or `delete` | Task number is below 1 or greater than the number of stored tasks | `InvalidTaskNumberException` | `OOPS!!! This panda cannot find task <number> in the bamboo stack.` |
+| `mark`, `unmark`, `update`, or `delete` | Task number is missing or is not an integer | `InvalidTaskNumberException` | `OOPS!!! This panda needs a valid task number after <command>.` |
+| `mark`, `unmark`, `update`, or `delete` | Task number is below 1 or greater than the number of stored tasks | `InvalidTaskNumberException` | `OOPS!!! This panda cannot find task <number> in the bamboo stack.` |
+| `update` | The update field is missing or malformed, `/name` is blank, an Event timing update omits an endpoint, or a combined update does not put `/name` last | `InvalidUpdateException` | `OOPS!!! This panda needs a valid update. Try /name <new name>, /by <date and time>, or /from <start> /to <end>.` |
+| `update` | `/by` targets a non-Deadline, or `/from` and `/to` target a non-Event | `InvalidUpdateException` | `OOPS!!! This panda cannot apply that timing update to this task type.` |
+| `update` | A supplied timing is malformed or is not a real date and time | `InvalidDateException` | `OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.` |
 | `bye` | Any arguments follow `bye` | `InvalidCommandException` | `OOPS!!! I'm bamboo-zled; I don't know what that means :-(` |
 | Any unsupported command | Command name is not recognized | `InvalidCommandException` | `OOPS!!! I'm bamboo-zled; I don't know what that means :-(` |
 | Startup data loading | A stored record has an unknown task type, invalid completion status, missing field, or incorrect number of fields | `DataLoadingException` handled at the individual-record boundary | `Line <number> has <error>`; skip that record and continue loading valid records. |

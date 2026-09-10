@@ -107,6 +107,8 @@ public class Panda {
                 return markTask(parsedCommand.taskNumber());
             case UNMARK:
                 return unmarkTask(parsedCommand.taskNumber());
+            case UPDATE:
+                return updateTask(parsedCommand.taskNumber(), parsedCommand.updateDetails());
             case DELETE:
                 return deleteTask(parsedCommand.taskNumber());
             case EVENT, DEADLINE, TODO:
@@ -130,6 +132,34 @@ public class Panda {
             throws InvalidTaskNumberException, DataSavingException {
         Task unmarkedTask = tasks.unmark(taskNumber);
         String response = ui.showUnmarked(unmarkedTask);
+        saveTasks();
+        return response;
+    }
+
+    private String updateTask(int taskNumber, Parser.UpdateDetails updateDetails)
+            throws PandaException {
+        Task updatedTask;
+        boolean hasTimingUpdate = updateDetails.updatedDeadlineDateTime() != null
+                || updateDetails.updatedStartDateTime() != null;
+        if (updateDetails.updatedDeadlineDateTime() != null) {
+            updatedTask = tasks.rescheduleDeadline(
+                    taskNumber, updateDetails.updatedDeadlineDateTime());
+        } else if (updateDetails.updatedStartDateTime() != null) {
+            assert updateDetails.updatedStartDateTime() != null
+                    && updateDetails.updatedEndDateTime() != null
+                    : "An Event timing update must contain both endpoints.";
+            updatedTask = tasks.rescheduleEvent(taskNumber,
+                    updateDetails.updatedStartDateTime(), updateDetails.updatedEndDateTime());
+        } else {
+            assert updateDetails.updatedName() != null
+                    : "An update must change a task's name or timing.";
+            updatedTask = tasks.rename(taskNumber, updateDetails.updatedName());
+        }
+
+        if (hasTimingUpdate && updateDetails.updatedName() != null) {
+            updatedTask = tasks.rename(taskNumber, updateDetails.updatedName());
+        }
+        String response = ui.showUpdated(updatedTask);
         saveTasks();
         return response;
     }
