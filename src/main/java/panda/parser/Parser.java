@@ -135,7 +135,7 @@ public class Parser {
     }
 
     /**
-     * Parses one name or timing change from an update command.
+     * Parses one or more compatible changes from an update command.
      */
     private UpdateDetails parseUpdateDetails(String updateText)
             throws InvalidUpdateException {
@@ -150,29 +150,82 @@ public class Parser {
 
         String deadlinePrefix = "/by ";
         if (updateText.startsWith(deadlinePrefix)) {
-            String updatedDeadlineDateTime = updateText.substring(deadlinePrefix.length()).trim();
-            if (!updatedDeadlineDateTime.isBlank()) {
-                return UpdateDetails.createForDeadline(updatedDeadlineDateTime);
+            return parseDeadlineUpdate(updateText.substring(deadlinePrefix.length()).trim());
+        }
+
+        String startPrefix = "/from ";
+        if (updateText.startsWith(startPrefix)) {
+            return parseEventUpdate(updateText, startPrefix);
+        }
+        throw new InvalidUpdateException();
+    }
+
+    /**
+     * Parses a Deadline timing update with an optional terminal name update.
+     */
+    private UpdateDetails parseDeadlineUpdate(String updateText)
+            throws InvalidUpdateException {
+        String nameMarker = " /name";
+        int nameMarkerIndex = updateText.indexOf(nameMarker);
+        if (nameMarkerIndex < 0) {
+            if (!updateText.isBlank()) {
+                return UpdateDetails.createForDeadline(updateText);
             }
             throw new InvalidUpdateException();
         }
 
-        String startPrefix = "/from ";
-        String endSeparator = " /to ";
-        if (updateText.startsWith(startPrefix)) {
-            int endSeparatorIndex = updateText.indexOf(endSeparator, startPrefix.length());
-            if (endSeparatorIndex > startPrefix.length()) {
-                String updatedStartDateTime = updateText.substring(
-                        startPrefix.length(), endSeparatorIndex).trim();
-                String updatedEndDateTime = updateText.substring(
-                        endSeparatorIndex + endSeparator.length()).trim();
-                if (!updatedStartDateTime.isBlank() && !updatedEndDateTime.isBlank()) {
-                    return UpdateDetails.createForEvent(
-                            updatedStartDateTime, updatedEndDateTime);
-                }
-            }
+        String nameSeparator = " /name ";
+        if (!updateText.startsWith(nameSeparator, nameMarkerIndex)) {
+            throw new InvalidUpdateException();
         }
-        throw new InvalidUpdateException();
+        String updatedDeadlineDateTime = updateText.substring(0, nameMarkerIndex).trim();
+        String updatedName = updateText.substring(nameMarkerIndex + nameSeparator.length()).trim();
+        if (updatedDeadlineDateTime.isBlank() || updatedName.isBlank()) {
+            throw new InvalidUpdateException();
+        }
+        return UpdateDetails.createForDeadlineAndName(
+                updatedDeadlineDateTime, updatedName);
+    }
+
+    /**
+     * Parses an Event timing update with an optional terminal name update.
+     */
+    private UpdateDetails parseEventUpdate(String updateText, String startPrefix)
+            throws InvalidUpdateException {
+        String endSeparator = " /to ";
+        int endSeparatorIndex = updateText.indexOf(endSeparator, startPrefix.length());
+        if (endSeparatorIndex <= startPrefix.length()) {
+            throw new InvalidUpdateException();
+        }
+
+        String updatedStartDateTime = updateText.substring(
+                startPrefix.length(), endSeparatorIndex).trim();
+        String endAndNameText = updateText.substring(
+                endSeparatorIndex + endSeparator.length()).trim();
+        String nameMarker = " /name";
+        int nameMarkerIndex = endAndNameText.indexOf(nameMarker);
+        if (nameMarkerIndex < 0) {
+            if (!updatedStartDateTime.isBlank() && !endAndNameText.isBlank()) {
+                return UpdateDetails.createForEvent(
+                        updatedStartDateTime, endAndNameText);
+            }
+            throw new InvalidUpdateException();
+        }
+
+        String nameSeparator = " /name ";
+        if (!endAndNameText.startsWith(nameSeparator, nameMarkerIndex)) {
+            throw new InvalidUpdateException();
+        }
+        String updatedEndDateTime = endAndNameText.substring(0, nameMarkerIndex).trim();
+        String updatedName = endAndNameText.substring(
+                nameMarkerIndex + nameSeparator.length()).trim();
+        if (updatedStartDateTime.isBlank()
+                || updatedEndDateTime.isBlank()
+                || updatedName.isBlank()) {
+            throw new InvalidUpdateException();
+        }
+        return UpdateDetails.createForEventAndName(
+                updatedStartDateTime, updatedEndDateTime, updatedName);
     }
 
     /**
@@ -274,7 +327,7 @@ public class Parser {
      * @param taskNumber a number for a command that targets an existing task.
      * @param filterDate an optional date supplied to list.
      * @param searchTerm a keyword supplied to find.
-     * @param updateDetails a name or timing change supplied to update.
+     * @param updateDetails one or more compatible changes supplied to update.
      */
     public record ParsedCommand(Command command, Task task, Integer taskNumber,
             LocalDate filterDate, String searchTerm, UpdateDetails updateDetails) {
@@ -345,7 +398,7 @@ public class Parser {
     }
 
     /**
-     * Holds the single name or timing change requested by an update command.
+     * Holds the name and timing changes requested by an update command.
      *
      * @param updatedName the replacement name, or null when unchanged.
      * @param updatedDeadlineDateTime the replacement deadline, or null when unchanged.
@@ -369,11 +422,29 @@ public class Parser {
         }
 
         /**
+         * Creates a combined Deadline timing and name update.
+         */
+        private static UpdateDetails createForDeadlineAndName(
+                String updatedDeadlineDateTime, String updatedName) {
+            return new UpdateDetails(updatedName, updatedDeadlineDateTime, null, null);
+        }
+
+        /**
          * Creates an Event timing update.
          */
         private static UpdateDetails createForEvent(
                 String updatedStartDateTime, String updatedEndDateTime) {
             return new UpdateDetails(null, null,
+                    updatedStartDateTime, updatedEndDateTime);
+        }
+
+        /**
+         * Creates a combined Event timing and name update.
+         */
+        private static UpdateDetails createForEventAndName(
+                String updatedStartDateTime, String updatedEndDateTime,
+                String updatedName) {
+            return new UpdateDetails(updatedName, null,
                     updatedStartDateTime, updatedEndDateTime);
         }
     }

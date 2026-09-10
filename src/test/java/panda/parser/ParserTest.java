@@ -85,6 +85,24 @@ class ParserTest {
     }
 
     @Test
+    void parse_combinedUpdateCommands_returnsNameAndTimingDetails() throws PandaException {
+        Parser.ParsedCommand deadlineResult = parser.parse(
+                "update 2 /by 2026-09-15 18:00 /name submit final report");
+        Parser.ParsedCommand eventResult = parser.parse(
+                "update 3 /from 2026-09-16 14:00 /to 2026-09-16 17:00 "
+                        + "/name project consultation");
+
+        assertEquals("submit final report", deadlineResult.updateDetails().updatedName());
+        assertEquals("2026-09-15 18:00",
+                deadlineResult.updateDetails().updatedDeadlineDateTime());
+        assertEquals("project consultation", eventResult.updateDetails().updatedName());
+        assertEquals("2026-09-16 14:00",
+                eventResult.updateDetails().updatedStartDateTime());
+        assertEquals("2026-09-16 17:00",
+                eventResult.updateDetails().updatedEndDateTime());
+    }
+
+    @Test
     void parse_listCommands_returnsOptionalDateFilter() throws PandaException {
         Parser.ParsedCommand unfiltered = parser.parse("list");
         Parser.ParsedCommand filtered = parser.parse("list 2026-08-26");
@@ -136,6 +154,10 @@ class ParserTest {
         assertThrows(InvalidUpdateException.class, () -> parser.parse("update 1 /name"));
         assertThrows(InvalidUpdateException.class, () -> parser.parse("update 1 /by"));
         assertThrows(InvalidUpdateException.class, () -> parser.parse("update 1 /from tomorrow"));
+        assertThrows(InvalidUpdateException.class, () ->
+                parser.parse("update 1 /by 2026-09-15 18:00 /name"));
+        assertThrows(InvalidUpdateException.class, () ->
+                parser.parse("update 1 /from 2026-09-16 14:00 /to 2026-09-16 17:00 /name"));
         assertThrows(InvalidDateException.class, () -> parser.parse("list 2025-02-29"));
         assertThrows(MissingDateTimeException.class, () ->
                 parser.parse("deadline submit report")

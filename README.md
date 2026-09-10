@@ -40,6 +40,19 @@ update <task number> /from <new start> /to <new end>
 
 Timing updates do not change the task's name, type, completion status, or position. An Event update must include both `/from` and `/to` values.
 
+Change a Deadline or Event's timing and name in one command by putting the
+terminal `/name` field after its timing fields:
+
+```text
+update <task number> /by <new date and time> /name <new name>
+update <task number> /from <new start> /to <new end> /name <new name>
+```
+
+For example, `update 2 /by 2026-09-15 18:00 /name submit final report`
+changes both properties of Deadline 2. The `/name` field is terminal, so all
+remaining text becomes the new name. Combined updates keep the task's type,
+completion status, and position unchanged.
+
 ## AI assistance
 
 OpenAI Codex was used as a coding assistant during the development of this project. Its contributions

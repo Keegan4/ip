@@ -139,17 +139,25 @@ public class Panda {
     private String updateTask(int taskNumber, Parser.UpdateDetails updateDetails)
             throws PandaException {
         Task updatedTask;
-        if (updateDetails.updatedName() != null) {
-            updatedTask = tasks.rename(taskNumber, updateDetails.updatedName());
-        } else if (updateDetails.updatedDeadlineDateTime() != null) {
+        boolean hasTimingUpdate = updateDetails.updatedDeadlineDateTime() != null
+                || updateDetails.updatedStartDateTime() != null;
+        if (updateDetails.updatedDeadlineDateTime() != null) {
             updatedTask = tasks.rescheduleDeadline(
                     taskNumber, updateDetails.updatedDeadlineDateTime());
-        } else {
+        } else if (updateDetails.updatedStartDateTime() != null) {
             assert updateDetails.updatedStartDateTime() != null
                     && updateDetails.updatedEndDateTime() != null
                     : "An Event timing update must contain both endpoints.";
             updatedTask = tasks.rescheduleEvent(taskNumber,
                     updateDetails.updatedStartDateTime(), updateDetails.updatedEndDateTime());
+        } else {
+            assert updateDetails.updatedName() != null
+                    : "An update must change a task's name or timing.";
+            updatedTask = tasks.rename(taskNumber, updateDetails.updatedName());
+        }
+
+        if (hasTimingUpdate && updateDetails.updatedName() != null) {
+            updatedTask = tasks.rename(taskNumber, updateDetails.updatedName());
         }
         String response = ui.showUpdated(updatedTask);
         saveTasks();

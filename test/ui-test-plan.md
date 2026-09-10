@@ -1098,3 +1098,109 @@ ____________________________________________________________
 Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
+
+## Test Case: Update task names and timings together
+
+Aim: Verify that combined updates change and save both properties while preserving task status, type, and position.
+
+Run command: `python test/run_panda_ui.py --fixture test/data/ui-valid-tasks.txt --expected-data test/data/ui-expected-combined-updated-tasks.txt`
+
+Input:
+
+```text
+update 2 /by 2026-09-15 18:00 /name submit final report
+update 3 /from 2026-09-16 14:00 /to 2026-09-16 17:00 /name project consultation
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+Got it. I've updated this task:
+  [D][ ] submit final report (by: Sep 15 2026 18:00)
+____________________________________________________________
+____________________________________________________________
+Got it. I've updated this task:
+  [E][ ] project consultation (from: Sep 16 2026 14:00 to: Sep 16 2026 17:00)
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[D][ ] submit final report (by: Sep 15 2026 18:00)
+3.[E][ ] project consultation (from: Sep 16 2026 14:00 to: Sep 16 2026 17:00)
+4.[T][X] join sports club
+5.[T][ ] buy bread | milk
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Reject invalid combined updates atomically
+
+Aim: Verify that malformed, invalid-date, and incompatible combined updates do not change either property.
+
+Run command: `python test/run_panda_ui.py --fixture test/data/ui-valid-tasks.txt`
+
+Input:
+
+```text
+update 1 /by 2026-09-15 18:00 /name renamed todo
+update 2 /by 2025-02-29 12:00 /name renamed deadline
+update 3 /from tomorrow /to 2026-09-16 17:00 /name renamed event
+update 2 /by 2026-09-15 18:00 /name
+update 3 /from 2026-09-16 14:00 /to 2026-09-16 17:00 /name
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+OOPS!!! This panda cannot apply that timing update to this task type.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid update. Try /name <new name>, /by <date and time>, or /from <start> /to <end>.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid update. Try /name <new name>, /by <date and time>, or /from <start> /to <end>.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[D][ ] return book (by: Jun 06 2019 18:00)
+3.[E][ ] project meeting (from: Aug 06 2019 14:00 to: Aug 08 2019 16:00)
+4.[T][X] join sports club
+5.[T][ ] buy bread | milk
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
