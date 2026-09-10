@@ -59,10 +59,29 @@ class ParserTest {
 
         assertEquals(Command.UPDATE, result.command());
         assertEquals(2, result.taskNumber());
-        assertEquals("discuss report /by Friday", result.updatedName());
+        assertEquals("discuss report /by Friday", result.updateDetails().updatedName());
+        assertNull(result.updateDetails().updatedDeadlineDateTime());
+        assertNull(result.updateDetails().updatedStartDateTime());
+        assertNull(result.updateDetails().updatedEndDateTime());
         assertNull(result.task());
         assertNull(result.filterDate());
         assertNull(result.searchTerm());
+    }
+
+    @Test
+    void parse_updateTimingCommands_returnsCompleteDateTimeText() throws PandaException {
+        Parser.ParsedCommand deadlineResult = parser.parse(
+                "update 2 /by 2026-09-15 18:00");
+        Parser.ParsedCommand eventResult = parser.parse(
+                "update 3 /from 2026-09-16 14:00 /to 2026-09-16 17:00");
+
+        assertEquals("2026-09-15 18:00",
+                deadlineResult.updateDetails().updatedDeadlineDateTime());
+        assertNull(deadlineResult.updateDetails().updatedName());
+        assertEquals("2026-09-16 14:00",
+                eventResult.updateDetails().updatedStartDateTime());
+        assertEquals("2026-09-16 17:00",
+                eventResult.updateDetails().updatedEndDateTime());
     }
 
     @Test
@@ -115,7 +134,8 @@ class ParserTest {
         assertThrows(InvalidTaskNumberException.class, () -> parser.parse("update bamboo /name book"));
         assertThrows(InvalidUpdateException.class, () -> parser.parse("update 1"));
         assertThrows(InvalidUpdateException.class, () -> parser.parse("update 1 /name"));
-        assertThrows(InvalidUpdateException.class, () -> parser.parse("update 1 /by tomorrow"));
+        assertThrows(InvalidUpdateException.class, () -> parser.parse("update 1 /by"));
+        assertThrows(InvalidUpdateException.class, () -> parser.parse("update 1 /from tomorrow"));
         assertThrows(InvalidDateException.class, () -> parser.parse("list 2025-02-29"));
         assertThrows(MissingDateTimeException.class, () ->
                 parser.parse("deadline submit report")

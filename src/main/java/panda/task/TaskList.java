@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import panda.exception.InvalidDateException;
 import panda.exception.InvalidTaskNumberException;
+import panda.exception.InvalidUpdateException;
 
 /**
  * Owns Panda's ordered collection of tasks and all operations on that list.
@@ -79,6 +81,48 @@ public class TaskList {
         Task task = getTask(taskNumber);
         task.rename(updatedName);
         return task;
+    }
+
+    /**
+     * Changes the deadline of the identified Deadline task.
+     *
+     * @param taskNumber the one-based task number.
+     * @param updatedDateTimeText the replacement deadline date and time.
+     * @return the rescheduled Deadline.
+     * @throws InvalidTaskNumberException if no task has that number.
+     * @throws InvalidUpdateException if the selected task is not a Deadline.
+     * @throws InvalidDateException if the replacement is not a valid date and time.
+     */
+    public Task rescheduleDeadline(int taskNumber, String updatedDateTimeText)
+            throws InvalidTaskNumberException, InvalidUpdateException, InvalidDateException {
+        Task task = getTask(taskNumber);
+        if (!(task instanceof Deadline deadline)) {
+            throw InvalidUpdateException.createForUnsupportedTiming();
+        }
+        deadline.reschedule(updatedDateTimeText);
+        return deadline;
+    }
+
+    /**
+     * Changes the complete time interval of the identified Event task.
+     *
+     * @param taskNumber the one-based task number.
+     * @param updatedStartDateTimeText the replacement starting date and time.
+     * @param updatedEndDateTimeText the replacement ending date and time.
+     * @return the rescheduled Event.
+     * @throws InvalidTaskNumberException if no task has that number.
+     * @throws InvalidUpdateException if the selected task is not an Event.
+     * @throws InvalidDateException if either replacement is not a valid date and time.
+     */
+    public Task rescheduleEvent(int taskNumber, String updatedStartDateTimeText,
+            String updatedEndDateTimeText)
+            throws InvalidTaskNumberException, InvalidUpdateException, InvalidDateException {
+        Task task = getTask(taskNumber);
+        if (!(task instanceof Event event)) {
+            throw InvalidUpdateException.createForUnsupportedTiming();
+        }
+        event.reschedule(updatedStartDateTimeText, updatedEndDateTimeText);
+        return event;
     }
 
     /**

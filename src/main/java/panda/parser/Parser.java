@@ -106,7 +106,7 @@ public class Parser {
     }
 
     /**
-     * Parses the task number and replacement name used by an update command.
+     * Parses the task number and requested change used by an update command.
      */
     private ParsedCommand parseUpdate(String message, Command command)
             throws InvalidTaskNumberException, InvalidUpdateException {
@@ -129,17 +129,50 @@ public class Parser {
             throw new InvalidTaskNumberException(command.getKeyword());
         }
 
-        String updateDetails = details.substring(firstSpaceIndex).trim();
+        String updateText = details.substring(firstSpaceIndex).trim();
+        UpdateDetails updateDetails = parseUpdateDetails(updateText);
+        return ParsedCommand.createWithUpdate(command, taskNumber, updateDetails);
+    }
+
+    /**
+     * Parses one name or timing change from an update command.
+     */
+    private UpdateDetails parseUpdateDetails(String updateText)
+            throws InvalidUpdateException {
         String namePrefix = "/name ";
-        if (!updateDetails.startsWith(namePrefix)) {
+        if (updateText.startsWith(namePrefix)) {
+            String updatedName = updateText.substring(namePrefix.length()).trim();
+            if (!updatedName.isBlank()) {
+                return UpdateDetails.createForName(updatedName);
+            }
             throw new InvalidUpdateException();
         }
 
-        String updatedName = updateDetails.substring(namePrefix.length()).trim();
-        if (updatedName.isBlank()) {
+        String deadlinePrefix = "/by ";
+        if (updateText.startsWith(deadlinePrefix)) {
+            String updatedDeadlineDateTime = updateText.substring(deadlinePrefix.length()).trim();
+            if (!updatedDeadlineDateTime.isBlank()) {
+                return UpdateDetails.createForDeadline(updatedDeadlineDateTime);
+            }
             throw new InvalidUpdateException();
         }
-        return ParsedCommand.createWithUpdatedName(command, taskNumber, updatedName);
+
+        String startPrefix = "/from ";
+        String endSeparator = " /to ";
+        if (updateText.startsWith(startPrefix)) {
+            int endSeparatorIndex = updateText.indexOf(endSeparator, startPrefix.length());
+            if (endSeparatorIndex > startPrefix.length()) {
+                String updatedStartDateTime = updateText.substring(
+                        startPrefix.length(), endSeparatorIndex).trim();
+                String updatedEndDateTime = updateText.substring(
+                        endSeparatorIndex + endSeparator.length()).trim();
+                if (!updatedStartDateTime.isBlank() && !updatedEndDateTime.isBlank()) {
+                    return UpdateDetails.createForEvent(
+                            updatedStartDateTime, updatedEndDateTime);
+                }
+            }
+        }
+        throw new InvalidUpdateException();
     }
 
     /**
@@ -241,10 +274,10 @@ public class Parser {
      * @param taskNumber a number for a command that targets an existing task.
      * @param filterDate an optional date supplied to list.
      * @param searchTerm a keyword supplied to find.
-     * @param updatedName a replacement name supplied to update.
+     * @param updateDetails a name or timing change supplied to update.
      */
     public record ParsedCommand(Command command, Task task, Integer taskNumber,
-            LocalDate filterDate, String searchTerm, String updatedName) {
+            LocalDate filterDate, String searchTerm, UpdateDetails updateDetails) {
         /**
          * Creates a parsed command without an argument.
          */
@@ -281,13 +314,13 @@ public class Parser {
         /**
          * Creates a parsed command that changes one task's name.
          */
-        private static ParsedCommand createWithUpdatedName(
-                Command command, int taskNumber, String updatedName) {
+        private static ParsedCommand createWithUpdate(
+                Command command, int taskNumber, UpdateDetails updateDetails) {
             assert command == Command.UPDATE
-                    : "Only the update command may contain an updated name.";
-            assert updatedName != null && !updatedName.isBlank()
-                    : "An update command must contain a non-blank name.";
-            return new ParsedCommand(command, null, taskNumber, null, null, updatedName);
+                    : "Only the update command may contain update details.";
+            assert updateDetails != null
+                    : "An update command must contain update details.";
+            return new ParsedCommand(command, null, taskNumber, null, null, updateDetails);
         }
 
         /**
@@ -308,6 +341,40 @@ public class Parser {
             assert searchTerm != null && !searchTerm.isBlank()
                     : "A find command must contain a search term.";
             return new ParsedCommand(command, null, null, null, searchTerm, null);
+        }
+    }
+
+    /**
+     * Holds the single name or timing change requested by an update command.
+     *
+     * @param updatedName the replacement name, or null when unchanged.
+     * @param updatedDeadlineDateTime the replacement deadline, or null when unchanged.
+     * @param updatedStartDateTime the replacement event start, or null when unchanged.
+     * @param updatedEndDateTime the replacement event end, or null when unchanged.
+     */
+    public record UpdateDetails(String updatedName, String updatedDeadlineDateTime,
+            String updatedStartDateTime, String updatedEndDateTime) {
+        /**
+         * Creates a name-only update.
+         */
+        private static UpdateDetails createForName(String updatedName) {
+            return new UpdateDetails(updatedName, null, null, null);
+        }
+
+        /**
+         * Creates a Deadline timing update.
+         */
+        private static UpdateDetails createForDeadline(String updatedDeadlineDateTime) {
+            return new UpdateDetails(null, updatedDeadlineDateTime, null, null);
+        }
+
+        /**
+         * Creates an Event timing update.
+         */
+        private static UpdateDetails createForEvent(
+                String updatedStartDateTime, String updatedEndDateTime) {
+            return new UpdateDetails(null, null,
+                    updatedStartDateTime, updatedEndDateTime);
         }
     }
 }

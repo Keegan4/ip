@@ -107,6 +107,17 @@ public class MainWindowTest {
                       [T][X] read Java book
                     Now you have 0 tasks in the list.
                     """);
+            submitAndAssert(userInput, sendButton, dialogContainer,
+                    "deadline submit report /by 2026-09-15 17:00", """
+                    Got it. I've added this task:
+                      [D][ ] submit report (by: Sep 15 2026 17:00)
+                    Now you have 1 task in the list.
+                    """);
+            submitAndAssert(userInput, sendButton, dialogContainer,
+                    "update 1 /by 2026-09-15 18:00", """
+                    Got it. I've updated this task:
+                      [D][ ] submit report (by: Sep 15 2026 18:00)
+                    """);
             submitAndAssert(userInput, sendButton, dialogContainer, "bye",
                     "Bye. Hope to see you again soon!");
             assertTrue(userInput.isDisabled());

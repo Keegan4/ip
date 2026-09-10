@@ -108,7 +108,7 @@ public class Panda {
             case UNMARK:
                 return unmarkTask(parsedCommand.taskNumber());
             case UPDATE:
-                return updateTask(parsedCommand.taskNumber(), parsedCommand.updatedName());
+                return updateTask(parsedCommand.taskNumber(), parsedCommand.updateDetails());
             case DELETE:
                 return deleteTask(parsedCommand.taskNumber());
             case EVENT, DEADLINE, TODO:
@@ -136,9 +136,21 @@ public class Panda {
         return response;
     }
 
-    private String updateTask(int taskNumber, String updatedName)
-            throws InvalidTaskNumberException, DataSavingException {
-        Task updatedTask = tasks.rename(taskNumber, updatedName);
+    private String updateTask(int taskNumber, Parser.UpdateDetails updateDetails)
+            throws PandaException {
+        Task updatedTask;
+        if (updateDetails.updatedName() != null) {
+            updatedTask = tasks.rename(taskNumber, updateDetails.updatedName());
+        } else if (updateDetails.updatedDeadlineDateTime() != null) {
+            updatedTask = tasks.rescheduleDeadline(
+                    taskNumber, updateDetails.updatedDeadlineDateTime());
+        } else {
+            assert updateDetails.updatedStartDateTime() != null
+                    && updateDetails.updatedEndDateTime() != null
+                    : "An Event timing update must contain both endpoints.";
+            updatedTask = tasks.rescheduleEvent(taskNumber,
+                    updateDetails.updatedStartDateTime(), updateDetails.updatedEndDateTime());
+        }
         String response = ui.showUpdated(updatedTask);
         saveTasks();
         return response;

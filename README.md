@@ -16,7 +16,7 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
 1. After that, locate the `src/main/java/panda/Panda.java` file, right-click it, and choose `Run Panda.main()` (if the code editor is showing compile errors, try restarting the IDE).
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
 
-## Updating task names
+## Updating tasks
 
 Change the name of any existing task without changing its type, completion status, timing, or position:
 
@@ -25,6 +25,20 @@ update <task number> /name <new name>
 ```
 
 For example, `update 2 /name submit final report` changes the name of task 2. The task number refers to its position in the complete task list.
+
+Change a Deadline's date and time using the strict `yyyy-MM-dd HH:mm` format:
+
+```text
+update <task number> /by <new date and time>
+```
+
+Change an Event's complete time interval using the same format:
+
+```text
+update <task number> /from <new start> /to <new end>
+```
+
+Timing updates do not change the task's name, type, completion status, or position. An Event update must include both `/from` and `/to` values.
 
 ## AI assistance
 

@@ -945,7 +945,7 @@ update
 update bamboo /name read book
 update 1
 update 1 /name
-update 1 /by tomorrow
+update 1 /title tomorrow
 update 99 /name read book
 bye
 ```
@@ -969,16 +969,130 @@ ____________________________________________________________
 OOPS!!! This panda needs a valid task number after update.
 ____________________________________________________________
 ____________________________________________________________
-OOPS!!! This panda needs a valid update. Try: update <task number> /name <new name>.
+OOPS!!! This panda needs a valid update. Try /name <new name>, /by <date and time>, or /from <start> /to <end>.
 ____________________________________________________________
 ____________________________________________________________
-OOPS!!! This panda needs a valid update. Try: update <task number> /name <new name>.
+OOPS!!! This panda needs a valid update. Try /name <new name>, /by <date and time>, or /from <start> /to <end>.
 ____________________________________________________________
 ____________________________________________________________
-OOPS!!! This panda needs a valid update. Try: update <task number> /name <new name>.
+OOPS!!! This panda needs a valid update. Try /name <new name>, /by <date and time>, or /from <start> /to <end>.
 ____________________________________________________________
 ____________________________________________________________
 OOPS!!! This panda cannot find task 99 in the bamboo stack.
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Update task timings and save them
+
+Aim: Verify that update reschedules Deadlines and Events while preserving names, statuses, positions, and stored data.
+
+Run command: `python test/run_panda_ui.py --fixture test/data/ui-valid-tasks.txt --expected-data test/data/ui-expected-rescheduled-tasks.txt`
+
+Input:
+
+```text
+update 2 /by 2026-09-15 18:00
+update 3 /from 2026-09-16 14:00 /to 2026-09-16 17:00
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+Got it. I've updated this task:
+  [D][ ] return book (by: Sep 15 2026 18:00)
+____________________________________________________________
+____________________________________________________________
+Got it. I've updated this task:
+  [E][ ] project meeting (from: Sep 16 2026 14:00 to: Sep 16 2026 17:00)
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[D][ ] return book (by: Sep 15 2026 18:00)
+3.[E][ ] project meeting (from: Sep 16 2026 14:00 to: Sep 16 2026 17:00)
+4.[T][X] join sports club
+5.[T][ ] buy bread | milk
+____________________________________________________________
+____________________________________________________________
+Bye. Hope to see you again soon!
+____________________________________________________________
+```
+
+## Test Case: Reject invalid timing updates
+
+Aim: Verify that timing updates reject incompatible task types, malformed intervals, and invalid dates without changing tasks.
+
+Run command: `python test/run_panda_ui.py --fixture test/data/ui-valid-tasks.txt`
+
+Input:
+
+```text
+update 1 /by 2026-09-15 18:00
+update 2 /from 2026-09-16 14:00 /to 2026-09-16 17:00
+update 3 /by 2026-09-15 18:00
+update 2 /by 2025-02-29 12:00
+update 3 /from tomorrow /to 2026-09-16 17:00
+update 3 /from 2026-09-16 14:00 /to later
+update 3 /from 2026-09-16 14:00
+list
+bye
+```
+
+Expected output:
+
+```text
+____________________________________________________________
+ ____    _    _   _ ____    _
+|  _ \  / \  | \ | |  _ \  / \
+| |_) |/ _ \ |  \| | | | |/ _ \
+|  __// ___ \| |\  | |_| / ___ \
+|_|  /_/   \_\_| \_|____/_/   \_\
+
+Hello! I'm Panda.
+What can I do for you?
+____________________________________________________________
+OOPS!!! This panda cannot apply that timing update to this task type.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda cannot apply that timing update to this task type.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda cannot apply that timing update to this task type.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs a valid update. Try /name <new name>, /by <date and time>, or /from <start> /to <end>.
+____________________________________________________________
+____________________________________________________________
+Here are the tasks in your list:
+1.[T][X] read book
+2.[D][ ] return book (by: Jun 06 2019 18:00)
+3.[E][ ] project meeting (from: Aug 06 2019 14:00 to: Aug 08 2019 16:00)
+4.[T][X] join sports club
+5.[T][ ] buy bread | milk
 ____________________________________________________________
 ____________________________________________________________
 Bye. Hope to see you again soon!
