@@ -1,21 +1,18 @@
 package panda.gui;
 
 import java.io.IOException;
-import java.util.Collections;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.shape.Circle;
 
 /**
- * Displays one message beside an image identifying its speaker.
+ * Displays compact user commands and full-width Panda response cards.
  */
 public class DialogBox extends HBox {
     @FXML
@@ -24,59 +21,55 @@ public class DialogBox extends HBox {
     private ImageView displayPicture;
 
     /**
-     * Creates a dialog box containing the supplied text and speaker image.
+     * Loads a message row and constrains its text to the available width.
      */
     private DialogBox(String text, Image image) {
-        FXMLLoader fxmlLoader = new FXMLLoader(
-                MainWindow.class.getResource("/view/DialogBox.fxml"));
-        fxmlLoader.setController(this);
-        fxmlLoader.setRoot(this);
+        FXMLLoader loader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
+        loader.setController(this);
+        loader.setRoot(this);
         try {
-            fxmlLoader.load();
+            loader.load();
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to load the dialog-box layout.", exception);
         }
-
         dialog.setText(text);
         displayPicture.setImage(image);
+        displayPicture.setClip(new Circle(20, 20, 20));
+        setMinWidth(0);
     }
 
     /**
-     * Creates a right-aligned dialog for a user message.
-     *
-     * @param text the message text.
-     * @param image the user's display image.
-     * @return the configured dialog box.
+     * Creates a right-aligned command chip without an avatar.
      */
-    public static DialogBox getUserDialog(String text, Image image) {
-        return new DialogBox(text, image);
+    public static DialogBox getUserDialog(String text) {
+        DialogBox row = new DialogBox(text, null);
+        row.getChildren().remove(row.displayPicture);
+        row.setAlignment(Pos.TOP_RIGHT);
+        row.dialog.getStyleClass().add("user-command");
+        row.dialog.maxWidthProperty().bind(row.widthProperty().multiply(0.85));
+        return row;
     }
 
     /**
-     * Creates a left-aligned dialog for a Panda response.
-     *
-     * @param text the response text.
-     * @param image Panda's display image.
-     * @return the configured dialog box.
+     * Creates a wide response card with a small circular Panda avatar.
      */
     public static DialogBox getPandaDialog(String text, Image image) {
-        DialogBox dialogBox = new DialogBox(text, image);
-        dialogBox.flip();
-        return dialogBox;
+        DialogBox row = new DialogBox(text, image);
+        row.dialog.getStyleClass().add("panda-response");
+        row.dialog.setMaxWidth(Double.MAX_VALUE);
+        return row;
+    }
+
+    /**
+     * Creates an error card whose accent and text distinguish it from success.
+     */
+    public static DialogBox getErrorDialog(String text, Image image) {
+        DialogBox row = getPandaDialog(text, image);
+        row.dialog.getStyleClass().add("error-response");
+        return row;
     }
 
     String getDialogText() {
         return dialog.getText();
-    }
-
-    /**
-     * Places Panda's image on the left and its response on the right.
-     */
-    private void flip() {
-        ObservableList<Node> children = FXCollections.observableArrayList(getChildren());
-        Collections.reverse(children);
-        getChildren().setAll(children);
-        setAlignment(Pos.TOP_LEFT);
-        dialog.getStyleClass().add("reply-label");
     }
 }

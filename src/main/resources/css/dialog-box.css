@@ -1,36 +1,26 @@
-.label {
-    -fx-background-color: #fff2c9;
-    -fx-border-color: #c59b47;
-    -fx-border-width: 1.5px;
-    -fx-background-radius: 1em 1em 0 1em;
-    -fx-border-radius: 1em 1em 0 1em;
-    -fx-font: 14px "Segoe UI";
+.user-command {
+    -fx-background-color: #315c37;
+    -fx-text-fill: white;
+    -fx-font-family: monospace;
+    -fx-font-size: 13px;
+    -fx-padding: 7px 10px;
+    -fx-background-radius: 10px 10px 2px 10px;
+}
+.panda-response {
+    -fx-background-color: white;
+    -fx-text-fill: #203826;
+    -fx-border-color: #d4dfc8;
+    -fx-border-width: 1px;
+    -fx-padding: 9px 10px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-font-size: 14px;
     -fx-line-spacing: 2px;
-    -fx-text-fill: #493718;
-    -fx-effect: dropshadow(gaussian, rgba(31, 63, 38, 0.16), 8, 0.2, 0, 2);
 }
-
-.reply-label {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #75a94f;
-    -fx-background-radius: 1em 1em 1em 0;
-    -fx-border-radius: 1em 1em 1em 0;
-    -fx-font-family: "Segoe UI";
-    -fx-text-fill: #183c26;
-}
-
-.add-label {
-    -fx-background-color: yellow;
-}
-
-.marked-label {
-    -fx-background-color: palegreen;
-}
-
-.delete-label {
-    -fx-background-color: lightpink;
-}
-
-#displayPicture {
-    -fx-effect: dropshadow(gaussian, rgba(25, 61, 35, 0.28), 10, 0.3, 2, 3);
+.error-response {
+    -fx-background-color: #fff0ed;
+    -fx-text-fill: #8b2822;
+    -fx-border-color: #c04739;
+    -fx-border-width: 1px 1px 1px 4px;
+    -fx-padding: 9px 10px 9px 7px;
 }

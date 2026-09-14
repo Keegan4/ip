@@ -32,12 +32,11 @@ Steps:
 Expected result:
 
 - Exactly one Panda window opens with the title `Panda`.
-- The welcome dialog contains the complete Panda banner, greeting, and playful emoticon reaction.
-- The waving panda artwork appears on Panda's left-aligned replies, and the explorer artwork appears
-  on the user's right-aligned messages; neither image is stretched or clipped.
+- The welcome dialog contains the short greeting: `Ready to tackle the bamboo pile? (^_^)`.
+- A 40 px circular Panda avatar appears beside replies; user command chips have no avatar.
 - The input field shows `Tell Panda what to do...`; the Send button is visible and enabled.
 - The original leafy bamboo artwork remains visible behind a lightly tinted conversation panel.
-- Panda replies use white and green bubbles; user messages use warm gold bubbles.
+- Panda replies use white and green bubbles; user commands use compact dark-green chips.
 - No console, exception dialog, blank scene, missing-image icon, or rendering corruption appears.
 
 ### Test Case: Minimum window size
@@ -52,7 +51,7 @@ Steps:
 
 Expected result:
 
-- The window does not become smaller than approximately 417 by 220 logical pixels.
+- The window does not become smaller than approximately 360 by 320 logical pixels.
 - The input field and Send button remain fully visible and do not overlap.
 - Dialog text wraps within the conversation area without being cut off horizontally.
 - A vertical scrollbar makes all earlier messages reachable.
@@ -69,7 +68,9 @@ Steps:
 
 Expected result:
 
-- The conversation area grows and shrinks with the window.
+- The conversation area and its translucent tint fill the window at every size.
+- Check 360 by 320, 460 by 620, and 800 by 700; long text wraps without horizontal clipping.
+- Bamboo tiles retain their proportions behind opaque response cards.
 - The input field expands while the Send button remains anchored at the lower right.
 - The conversation area stays above the input controls.
 - Background tiling is visually continuous; dialog text and images remain sharp and aligned.
@@ -122,7 +123,8 @@ Steps:
 Expected result:
 
 - Every command creates a user dialog and one readable Panda response.
-- Each invalid command displays its focused error message without a stack trace.
+- Each invalid command displays a pale-red card, dark-red text, a strong left accent, and `(>_<)`.
+- The original error message remains readable, including for a task-saving failure.
 - Long error text wraps without overlapping the avatar or window edge.
 - The valid command succeeds after the errors.
 
@@ -139,11 +141,10 @@ Steps:
 
 Expected result:
 
-- User messages are right aligned with the user image on the right.
+- User commands are right aligned without an avatar.
 - Panda messages are left aligned with Panda's image on the left.
 - Panda response labels use the white-and-green reply styling and readable text.
-- Panda's added reaction line matches the result: cheerful for successful commands, apologetic for
-  errors, and a snack-themed farewell for `bye`.
+- The first response line ends with `(^_^)`, `(>_<)` for errors, or `(^_^)/` for farewell.
 - Completion markers, task type markers, indentation, and line breaks align consistently.
 
 ### Test Case: Long conversation and automatic scrolling

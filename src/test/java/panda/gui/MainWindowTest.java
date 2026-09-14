@@ -18,9 +18,13 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import panda.Panda;
 
@@ -66,7 +70,7 @@ public class MainWindowTest {
         try {
             FXMLLoader loader = new FXMLLoader(
                     MainWindow.class.getResource("/view/MainWindow.fxml"));
-            AnchorPane root = loader.load();
+            BorderPane root = loader.load();
             Path dataFile = temporaryDirectory.resolve("tasks.txt");
             loader.<MainWindow>getController().setPanda(new Panda(dataFile.toString()));
 
@@ -78,63 +82,46 @@ public class MainWindowTest {
             Button sendButton = (Button) scene.lookup("#sendButton");
             VBox dialogContainer = (VBox) scene.lookup("#dialogContainer");
 
-            assertDialogText(dialogContainer, 0, """
-                     ____    _    _   _ ____    _
-                    |  _ \\  / \\  | \\ | |  _ \\  / \\
-                    | |_) |/ _ \\ |  \\| | | | |/ _ \\
-                    |  __// ___ \\| |\\  | |_| / ___ \\
-                    |_|  /_/   \\_\\_| \\_|____/_/   \\_\\
-
-                    Hello! I'm Panda.
-                    What can I do for you?
-                    Panda is awake, wiggling, and ready for tasks! (^_^)""");
+            assertDialogText(dialogContainer, 0, "Ready to tackle the bamboo pile? (^_^)");
             submitAndAssert(userInput, sendButton, dialogContainer, "todo read book", """
-                    Got it. I've added this task:
+                    Got it. I've added this task: (^_^)
                       [T][ ] read book
                     Now you have 1 task in the list.
-                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer, "mark 1", """
-                    Nice! I've marked this task as done:
+                    Nice! I've marked this task as done: (^_^)
                       [X] read book
-                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer,
                     "update 1 /name read Java book", """
-                    Got it. I've updated this task:
+                    Got it. I've updated this task: (^_^)
                       [T][X] read Java book
-                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer, "list", """
-                    Here are the tasks in your list:
+                    Here are the tasks in your list: (^_^)
                     1.[T][X] read Java book
-                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer, "unknown", """
-                    OOPS!!! I'm bamboo-zled; I don't know what that means :-(
-                    Oops, my paws got tangled! Let's try that again. (>_<)""");
+                    OOPS!!! I'm bamboo-zled; I don't know what that means :-( (>_<)""");
             submitAndAssert(userInput, sendButton, dialogContainer, "delete 1", """
-                    Noted. I've removed this task:
+                    Noted. I've removed this task: (^_^)
                       [T][X] read Java book
                     Now you have 0 tasks in the list.
-                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer,
                     "deadline submit report /by 2026-09-15 17:00", """
-                    Got it. I've added this task:
+                    Got it. I've added this task: (^_^)
                       [D][ ] submit report (by: Sep 15 2026 17:00)
                     Now you have 1 task in the list.
-                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer,
                     "update 1 /by 2026-09-15 18:00", """
-                    Got it. I've updated this task:
+                    Got it. I've updated this task: (^_^)
                       [D][ ] submit report (by: Sep 15 2026 18:00)
-                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
+            verifyLayout(root, scene, dialogContainer, userInput);
             submitAndAssert(userInput, sendButton, dialogContainer, "bye", """
-                    Bye. Hope to see you again soon!
-                    Panda waddles off in search of a crunchy snack... (^_^)/""");
+                    Bye. Hope to see you again soon! (^_^)/""");
             assertTrue(userInput.isDisabled());
             assertTrue(sendButton.isDisabled());
         } catch (Throwable throwable) {
@@ -163,8 +150,40 @@ public class MainWindowTest {
     private void assertDialogText(VBox dialogContainer, int dialogIndex,
             String expectedText) {
         DialogBox dialogBox = (DialogBox) dialogContainer.getChildren().get(dialogIndex);
-        assertEquals(normalizeLineEndings(expectedText),
+        assertEquals(normalizeLineEndings(expectedText.stripTrailing()),
                 normalizeLineEndings(dialogBox.getDialogText()));
+    }
+
+    /**
+     * Checks message identity, error emphasis, and wrapping at compact and wide sizes.
+     */
+    private void verifyLayout(BorderPane root, Scene scene, VBox dialogs, TextField input) {
+        DialogBox userRow = (DialogBox) dialogs.getChildren().get(1);
+        assertTrue(userRow.getChildren().stream().noneMatch(ImageView.class::isInstance));
+        DialogBox pandaRow = (DialogBox) dialogs.getChildren().get(2);
+        ImageView avatar = (ImageView) pandaRow.getChildren().getFirst();
+        assertEquals(40, avatar.getFitWidth());
+        assertEquals(40, avatar.getFitHeight());
+        assertTrue(avatar.getClip() instanceof Circle);
+        DialogBox errorRow = (DialogBox) dialogs.getChildren().get(10);
+        Label error = (Label) errorRow.getChildren().getLast();
+        assertTrue(error.getStyleClass().contains("error-response"));
+
+        ScrollPane scroll = (ScrollPane) scene.lookup("#scrollPane");
+        root.resize(360, 320);
+        root.applyCss();
+        root.layout();
+        double narrowInput = input.getWidth();
+        double narrowViewport = scroll.getViewportBounds().getWidth();
+        double narrowHeight = pandaRow.getHeight();
+        root.resize(800, 700);
+        root.layout();
+        assertTrue(input.getWidth() > narrowInput);
+        assertTrue(scroll.getViewportBounds().getWidth() > narrowViewport);
+        assertTrue(pandaRow.getHeight() <= narrowHeight);
+        for (javafx.scene.Node row : dialogs.getChildren()) {
+            assertTrue(row.getBoundsInParent().getMaxX() <= scroll.getViewportBounds().getWidth() + 1);
+        }
     }
 
     private String normalizeLineEndings(String text) {

@@ -7,30 +7,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import panda.Panda;
-import panda.ui.Ui;
 
 /**
  * Controls Panda's main JavaFX window.
  */
-public class MainWindow extends AnchorPane {
+public class MainWindow extends BorderPane {
     /** Gives JavaFX time to render Panda's farewell before closing the window. */
     private static final Duration EXIT_DELAY = Duration.millis(750);
-    private static final String WELCOME_REACTION =
-            "Panda is awake, wiggling, and ready for tasks! (^_^)";
-    private static final String SUCCESS_REACTION =
-            "Bamboo power! Another tiny victory for the pile. (^_^)";
-    private static final String ERROR_REACTION =
-            "Oops, my paws got tangled! Let's try that again. (>_<)";
-    private static final String EXIT_REACTION =
-            "Panda waddles off in search of a crunchy snack... (^_^)/";
-
-    private final Ui ui = new Ui();
-    private final Image userImage = new Image(
-            getClass().getResourceAsStream("/images/explorer-avatar.png"));
     private final Image pandaImage = new Image(
             getClass().getResourceAsStream("/images/panda-avatar.png"));
 
@@ -58,7 +45,7 @@ public class MainWindow extends AnchorPane {
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
         dialogContainer.getChildren().add(
                 DialogBox.getPandaDialog(
-                        appendReaction(ui.showWelcome(), WELCOME_REACTION), pandaImage));
+                        "Ready to tackle the bamboo pile? (^_^)", pandaImage));
     }
 
     /**
@@ -80,13 +67,16 @@ public class MainWindow extends AnchorPane {
         String input = userInput.getText();
         boolean shouldExit = panda.isExitCommand(input);
         String response = panda.getResponse(input);
-        String responseReaction = getResponseReaction(response, shouldExit);
+        boolean isError = response.startsWith("OOPS!!!");
+        String mood = shouldExit ? "(^_^)/" : isError ? "(>_<)" : "(^_^)";
+        String displayResponse = formatResponse(response, mood);
 
         dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, userImage),
-                DialogBox.getPandaDialog(
-                        appendReaction(response, responseReaction), pandaImage));
+                DialogBox.getUserDialog(input),
+                isError ? DialogBox.getErrorDialog(displayResponse, pandaImage)
+                        : DialogBox.getPandaDialog(displayResponse, pandaImage));
         userInput.clear();
+        userInput.requestFocus();
 
         if (shouldExit) {
             closeAfterFarewell();
@@ -94,33 +84,15 @@ public class MainWindow extends AnchorPane {
     }
 
     /**
-     * Chooses a playful reaction that fits the result of a command.
-     *
-     * @param response the functional response returned by Panda.
-     * @param shouldExit whether the command ends the session.
-     * @return the matching personality line.
+     * Adds a compact mood marker to the first response line.
      */
-    private String getResponseReaction(String response, boolean shouldExit) {
-        if (shouldExit) {
-            return EXIT_REACTION;
+    private String formatResponse(String response, String mood) {
+        String normalized = response.stripTrailing().replace("\r\n", "\n");
+        int firstBreak = normalized.indexOf('\n');
+        if (firstBreak < 0) {
+            return normalized + " " + mood;
         }
-        if (response.startsWith("OOPS!!!")) {
-            return ERROR_REACTION;
-        }
-        return SUCCESS_REACTION;
-    }
-
-    /**
-     * Places a personality line after Panda's functional response.
-     *
-     * @param response the functional response.
-     * @param reaction the playful personality line.
-     * @return the combined GUI response.
-     */
-    private String appendReaction(String response, String reaction) {
-        String lineSeparator = System.lineSeparator();
-        String trailingLineSeparator = response.endsWith(lineSeparator) ? lineSeparator : "";
-        return response.stripTrailing() + lineSeparator + reaction + trailingLineSeparator;
+        return normalized.substring(0, firstBreak) + " " + mood + normalized.substring(firstBreak);
     }
 
     /**
