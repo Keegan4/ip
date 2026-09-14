@@ -68,3 +68,12 @@ included:
 AI-assisted changes were checked by compiling with Java 25, running the Gradle JUnit suite, generating
 Javadocs, and running the project's repeatable command-line UI tests. The project author remains
 responsible for reviewing the resulting code and for the final design and implementation decisions.
+
+## Credits
+https://www.magnific.com/free-vector/chinese-japanese-bamboo-grass-oriental-wallpaper-tropical-asian-plant-background_13422910.htm#fromView=keyword&page=1&position=2&uuid=fa8a1641-1e11-4a69-8ea1-47bb7fc945fb&track=ais_hybrid&query=Bamboo+clip+art
+
+https://media.istockphoto.com/id/1195743934/vector/cute-panda-character-vector-design.jpg?s=612x612&w=0&k=20&c=J3ht-bKADmsXvF6gFIleRtfJ6NGhXnfIsrwlsUF8w80=
+
+
+
+
