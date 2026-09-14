@@ -42,17 +42,17 @@ public enum Command {
     private final String keyword;
 
     /** Distinguishes commands that may contain details after their keyword. */
-    private final boolean acceptsArguments;
+    private final boolean canAcceptArguments;
 
     /**
      * Creates a command definition.
      *
      * @param keyword the command word entered by the user.
-     * @param acceptsArguments whether text may follow the command word.
+     * @param canAcceptArguments whether text may follow the command word.
      */
-    Command(String keyword, boolean acceptsArguments) {
+    Command(String keyword, boolean canAcceptArguments) {
         this.keyword = keyword;
-        this.acceptsArguments = acceptsArguments;
+        this.canAcceptArguments = canAcceptArguments;
     }
 
     /**
@@ -89,6 +89,6 @@ public enum Command {
      * @return true when the message follows this command's argument rule.
      */
     public boolean matches(String message) {
-        return message.equals(keyword) || acceptsArguments && message.startsWith(keyword + " ");
+        return message.equals(keyword) || canAcceptArguments && message.startsWith(keyword + " ");
     }
 }
