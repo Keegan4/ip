@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import javafx.application.Platform;
@@ -24,7 +26,10 @@ import panda.Panda;
 
 /**
  * Exercises the main JavaFX window through its visible input and dialog controls.
+ * The macOS GitHub runner cannot create JavaFX stages in its noninteractive session,
+ * so macOS window behavior is covered by the manual GUI test plan.
  */
+@DisabledOnOs(OS.MAC)
 public class MainWindowTest {
     private static final int GUI_TIMEOUT_SECONDS = 15;
 

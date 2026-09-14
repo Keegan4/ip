@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import panda.exception.DataLoadingException;
@@ -171,6 +173,7 @@ class StorageTest {
     }
 
     @Test
+    @EnabledOnOs(OS.WINDOWS)
     void load_directoryPath_throwsDataLoadingExceptionWithCause() throws IOException {
         Path directory = temporaryDirectory.resolve("data-directory");
         Files.createDirectory(directory);

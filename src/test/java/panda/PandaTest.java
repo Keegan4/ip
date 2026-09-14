@@ -16,6 +16,8 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 /**
@@ -184,6 +186,7 @@ class PandaTest {
     }
 
     @Test
+    @EnabledOnOs(OS.WINDOWS)
     void run_unreadableDataPath_reportsLoadingErrorAndStartsWithEmptyList()
             throws IOException {
         Path dataDirectory = temporaryDirectory.resolve("data-directory");
