@@ -32,9 +32,12 @@ Steps:
 Expected result:
 
 - Exactly one Panda window opens with the title `Panda`.
-- The welcome dialog contains the complete Panda banner, greeting, and prompt.
-- Panda's image is on the left of its dialog and is not stretched or clipped.
-- The input field shows `Type a command...`; the Send button is visible and enabled.
+- The welcome dialog contains the complete Panda banner, greeting, and playful emoticon reaction.
+- The waving panda artwork appears on Panda's left-aligned replies, and the explorer artwork appears
+  on the user's right-aligned messages; neither image is stretched or clipped.
+- The input field shows `Tell Panda what to do...`; the Send button is visible and enabled.
+- The original leafy bamboo artwork remains visible behind a lightly tinted conversation panel.
+- Panda replies use white and green bubbles; user messages use warm gold bubbles.
 - No console, exception dialog, blank scene, missing-image icon, or rendering corruption appears.
 
 ### Test Case: Minimum window size
@@ -138,7 +141,9 @@ Expected result:
 
 - User messages are right aligned with the user image on the right.
 - Panda messages are left aligned with Panda's image on the left.
-- Panda response labels use the reply bubble styling and readable monospace text.
+- Panda response labels use the white-and-green reply styling and readable text.
+- Panda's added reaction line matches the result: cheerful for successful commands, apologetic for
+  errors, and a snack-themed farewell for `bye`.
 - Completion markers, task type markers, indentation, and line breaks align consistently.
 
 ### Test Case: Long conversation and automatic scrolling

@@ -86,45 +86,55 @@ public class MainWindowTest {
                     |_|  /_/   \\_\\_| \\_|____/_/   \\_\\
 
                     Hello! I'm Panda.
-                    What can I do for you?""");
+                    What can I do for you?
+                    Panda is awake, wiggling, and ready for tasks! (^_^)""");
             submitAndAssert(userInput, sendButton, dialogContainer, "todo read book", """
                     Got it. I've added this task:
                       [T][ ] read book
                     Now you have 1 task in the list.
+                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer, "mark 1", """
                     Nice! I've marked this task as done:
                       [X] read book
+                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer,
                     "update 1 /name read Java book", """
                     Got it. I've updated this task:
                       [T][X] read Java book
+                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer, "list", """
                     Here are the tasks in your list:
                     1.[T][X] read Java book
+                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer, "unknown", """
-                    OOPS!!! I'm bamboo-zled; I don't know what that means :-(""");
+                    OOPS!!! I'm bamboo-zled; I don't know what that means :-(
+                    Oops, my paws got tangled! Let's try that again. (>_<)""");
             submitAndAssert(userInput, sendButton, dialogContainer, "delete 1", """
                     Noted. I've removed this task:
                       [T][X] read Java book
                     Now you have 0 tasks in the list.
+                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer,
                     "deadline submit report /by 2026-09-15 17:00", """
                     Got it. I've added this task:
                       [D][ ] submit report (by: Sep 15 2026 17:00)
                     Now you have 1 task in the list.
+                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
             submitAndAssert(userInput, sendButton, dialogContainer,
                     "update 1 /by 2026-09-15 18:00", """
                     Got it. I've updated this task:
                       [D][ ] submit report (by: Sep 15 2026 18:00)
+                    Bamboo power! Another tiny victory for the pile. (^_^)
                     """);
-            submitAndAssert(userInput, sendButton, dialogContainer, "bye",
-                    "Bye. Hope to see you again soon!");
+            submitAndAssert(userInput, sendButton, dialogContainer, "bye", """
+                    Bye. Hope to see you again soon!
+                    Panda waddles off in search of a crunchy snack... (^_^)/""");
             assertTrue(userInput.isDisabled());
             assertTrue(sendButton.isDisabled());
         } catch (Throwable throwable) {
