@@ -1,12 +1,15 @@
 package panda.gui;
 
+import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -30,6 +33,13 @@ public class MainWindow extends BorderPane {
     @FXML
     private Button sendButton;
 
+    @FXML
+    private ImageView headerAvatar;
+    @FXML
+    private Label inputFeedback;
+    @FXML
+    private VBox composer;
+
     private Panda panda;
 
     /**
@@ -42,6 +52,7 @@ public class MainWindow extends BorderPane {
         assert userInput != null : "fx:id=\"userInput\" was not injected.";
         assert sendButton != null : "fx:id=\"sendButton\" was not injected.";
 
+        headerAvatar.setImage(pandaImage);
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
         dialogContainer.getChildren().add(
                 DialogBox.getPandaDialog(
@@ -75,7 +86,17 @@ public class MainWindow extends BorderPane {
                 DialogBox.getUserDialog(input),
                 isError ? DialogBox.getErrorDialog(displayResponse, pandaImage)
                         : DialogBox.getPandaDialog(displayResponse, pandaImage));
-        userInput.clear();
+        inputFeedback.setText(isError ? "Check the command below. Panda kept it here for editing." : "");
+        inputFeedback.setVisible(isError);
+        inputFeedback.setManaged(isError);
+        if (!isError) {
+            userInput.clear();
+        }
+        FadeTransition arrival = new FadeTransition(Duration.millis(160),
+                dialogContainer.getChildren().getLast());
+        arrival.setFromValue(0.4);
+        arrival.setToValue(1);
+        arrival.play();
         userInput.requestFocus();
 
         if (shouldExit) {
@@ -99,6 +120,7 @@ public class MainWindow extends BorderPane {
      * Prevents further input and closes JavaFX after the farewell is rendered.
      */
     private void closeAfterFarewell() {
+        composer.setDisable(true);
         userInput.setDisable(true);
         sendButton.setDisable(true);
         PauseTransition exitDelay = new PauseTransition(EXIT_DELAY);

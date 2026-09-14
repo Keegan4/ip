@@ -120,6 +120,10 @@ public class MainWindowTest {
                       [D][ ] submit report (by: Sep 15 2026 18:00)
                     """);
             verifyLayout(root, scene, dialogContainer, userInput);
+            assertNull(scene.lookup("#addShortcut"));
+            assertNull(scene.lookup("#todayShortcut"));
+            assertNull(scene.lookup("#findShortcut"));
+            assertNull(scene.lookup("#moreMenu"));
             submitAndAssert(userInput, sendButton, dialogContainer, "bye", """
                     Bye. Hope to see you again soon! (^_^)/""");
             assertTrue(userInput.isDisabled());
@@ -140,7 +144,7 @@ public class MainWindowTest {
         userInput.setText(command);
         sendButton.fire();
 
-        assertEquals("", userInput.getText());
+        assertEquals(expectedResponse.startsWith("OOPS!!!") ? command : "", userInput.getText());
         assertDialogText(dialogContainer, pandaDialogIndex, expectedResponse);
     }
 
@@ -166,6 +170,30 @@ public class MainWindowTest {
         assertEquals(40, avatar.getFitHeight());
         assertTrue(avatar.getClip() instanceof Circle);
         DialogBox errorRow = (DialogBox) dialogs.getChildren().get(10);
+        DialogBox marked = (DialogBox) dialogs.getChildren().get(4);
+        assertTrue(marked.lookup(".completed-task") != null);
+        assertEquals("read book", ((Label) marked.lookup(".task-title")).getText());
+        DialogBox reopened = DialogBox.getPandaDialog(
+                "OK, I've marked this task as not done yet: (^_^)\n  [ ] read book", avatar.getImage());
+        assertTrue(reopened.lookup(".reopened-task") != null);
+        assertEquals("read book", ((Label) reopened.lookup(".task-title")).getText());
+        DialogBox dates = DialogBox.getPandaDialog(
+                "Here are the tasks in your list:\n"
+                        + "2.[D][ ] report (by: Sep 15 2026 18:00)\n"
+                        + "3.[E][X] meeting (from: Sep 15 2026 18:00 to: Sep 15 2026 19:00)",
+                avatar.getImage());
+        assertTrue(dates.lookup(".task-d") != null);
+        assertTrue(dates.lookup(".task-e") != null);
+        assertTrue(dates.lookupAll(".task-title").stream()
+                .map(node -> ((Label) node).getText()).anyMatch("report"::equals));
+        DialogBox empty = DialogBox.getPandaDialog("Here are the tasks in your list:", avatar.getImage());
+        assertTrue(empty.lookup(".empty-message") != null);
+        assertTrue(pandaRow.lookupAll(".task-card").size() == 1);
+        assertTrue(pandaRow.lookup(".task-t") != null);
+        DialogBox deleted = (DialogBox) dialogs.getChildren().get(12);
+        assertTrue(deleted.lookup(".removed-task") != null);
+        DialogBox listed = (DialogBox) dialogs.getChildren().get(8);
+        assertTrue(listed.lookup(".task-card") != null);
         Label error = (Label) errorRow.getChildren().getLast();
         assertTrue(error.getStyleClass().contains("error-response"));
 
