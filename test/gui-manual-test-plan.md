@@ -32,12 +32,11 @@ Steps:
 Expected result:
 
 - Exactly one Panda window opens with the title `Panda`.
-- The welcome dialog contains the complete Panda banner, greeting, and playful emoticon reaction.
-- The waving panda artwork appears on Panda's left-aligned replies, and the explorer artwork appears
-  on the user's right-aligned messages; neither image is stretched or clipped.
+- The welcome dialog contains the short greeting: `Ready to tackle the bamboo pile? (^_^)`.
+- A 40 px circular Panda avatar appears beside replies; user command chips have no avatar.
 - The input field shows `Tell Panda what to do...`; the Send button is visible and enabled.
-- The original leafy bamboo artwork remains visible behind a lightly tinted conversation panel.
-- Panda replies use white and green bubbles; user messages use warm gold bubbles.
+- The bamboo artwork appears in the header; the conversation uses an off-white reading surface.
+- Panda replies use white and green bubbles; user commands use compact dark-green chips.
 - No console, exception dialog, blank scene, missing-image icon, or rendering corruption appears.
 
 ### Test Case: Minimum window size
@@ -52,7 +51,7 @@ Steps:
 
 Expected result:
 
-- The window does not become smaller than approximately 417 by 220 logical pixels.
+- The window does not become smaller than approximately 360 by 320 logical pixels.
 - The input field and Send button remain fully visible and do not overlap.
 - Dialog text wraps within the conversation area without being cut off horizontally.
 - A vertical scrollbar makes all earlier messages reachable.
@@ -69,7 +68,9 @@ Steps:
 
 Expected result:
 
-- The conversation area grows and shrinks with the window.
+- The off-white conversation surface fills the window at every size.
+- Check 360 by 320, 460 by 620, and 800 by 700; long text wraps without horizontal clipping.
+- Bamboo tiles retain their proportions in the compact header.
 - The input field expands while the Send button remains anchored at the lower right.
 - The conversation area stays above the input controls.
 - Background tiling is visually continuous; dialog text and images remain sharp and aligned.
@@ -84,12 +85,12 @@ Steps:
 
 1. Click the input field, type `todo keyboard task`, and press Enter.
 2. Immediately type `list` without clicking the field again and press Enter.
-3. Press Tab repeatedly to move between controls, then activate Send with the keyboard.
+3. Press Tab between the input field and Send control; activate Send with the keyboard.
 
 Expected result:
 
 - Enter submits each command exactly once.
-- The input field is cleared after each submission and remains ready for the next command.
+- The input field clears after success; errors retain the command for editing.
 - Tab focus is visibly identifiable and reaches the input field and Send button in a sensible order.
 - Activating Send from the keyboard produces the same result as pressing Enter.
 
@@ -107,7 +108,7 @@ Expected result:
 
 - The button changes appearance for hover and pressed states.
 - One click produces exactly one user dialog and one Panda response.
-- The input field clears, and no duplicate task is created.
+- The input field clears after success, and no duplicate task is created.
 
 ### Test Case: Empty and invalid commands
 
@@ -122,7 +123,8 @@ Steps:
 Expected result:
 
 - Every command creates a user dialog and one readable Panda response.
-- Each invalid command displays its focused error message without a stack trace.
+- Each invalid command displays a pale-red card, dark-red text, a strong left accent, and `(>_<)`.
+- The original error message remains readable, including for a task-saving failure.
 - Long error text wraps without overlapping the avatar or window edge.
 - The valid command succeeds after the errors.
 
@@ -139,11 +141,10 @@ Steps:
 
 Expected result:
 
-- User messages are right aligned with the user image on the right.
+- User commands are right aligned without an avatar.
 - Panda messages are left aligned with Panda's image on the left.
 - Panda response labels use the white-and-green reply styling and readable text.
-- Panda's added reaction line matches the result: cheerful for successful commands, apologetic for
-  errors, and a snack-themed farewell for `bye`.
+- The first response line ends with `(^_^)`, `(>_<)` for errors, or `(^_^)/` for farewell.
 - Completion markers, task type markers, indentation, and line breaks align consistently.
 
 ### Test Case: Long conversation and automatic scrolling
@@ -279,3 +280,31 @@ exit cases on each supported platform:
 
 CI proves that automated checks execute on all three systems. This manual matrix verifies native
 window decoration, fonts, pointer behavior, display scaling, and actual visual rendering.
+
+
+
+## Mobile-style task presentation
+
+- Header: Panda icon, title, and companion subtitle inside one solid white rounded bubble. No menu.
+- Enter commands directly; there are no Add task, Today, or Find buttons. Press Enter or the upward-arrow Send button.
+- Run an empty list: show the clear-bamboo-patch message. Enter `todo first task` to create the first task.
+- Add a to-do, deadline, and event with long names. Run list and find: each result has its original
+  number, type, Open/Done status, prominent title, and separate timing for dated tasks.
+- To-dos are soft green, deadlines amber, and events lavender; their text labels identify the type too.
+- Add and delete each type: Task added / Task removed headings identify the action, the affected
+  task has its own card, and the task count is a separate caption. Removed cards have a rose tint.
+- Invalid commands stay in the composer for editing; a red hint appears beside it and clears after
+  a successful submission. Error cards retain the full error message.
+- Check 360 by 320 and maximized windows: header, composer, and task text remain usable.
+- Keyboard focus, English/Chinese text, and 125–200% scaling follow the matrix above.
+- Confirm a brief reply fade does not block typing, scrolling, or bye shutdown.
+
+
+### Completion cards
+
+Enter `todo read book`, `mark 1`, and `unmark 1` in a fresh session.
+Mark shows a green Task completed card with Done status and the title read book.
+Unmark shows a blue Task reopened card with Open status and the same title.
+Neither title contains the console marker or leading indentation. Repeat with long task names,
+deadlines, and events; the name should wrap normally. At minimum window size and high DPI,
+the complete header should remain readable inside one white bubble, with bamboo only around its edges.

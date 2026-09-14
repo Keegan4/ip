@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import panda.Panda;
 
@@ -27,11 +27,12 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
         Panda panda = new Panda(DEFAULT_DATA_FILE_PATH.toString());
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
-        AnchorPane root = fxmlLoader.load();
+        BorderPane root = fxmlLoader.load();
 
         fxmlLoader.<MainWindow>getController().setPanda(panda);
-        stage.setMinHeight(220);
-        stage.setMinWidth(417);
+        stage.setMinHeight(320);
+        stage.setMinWidth(360);
+        stage.setResizable(true);
         stage.setTitle("Panda");
         stage.setScene(new Scene(root));
         stage.show();
