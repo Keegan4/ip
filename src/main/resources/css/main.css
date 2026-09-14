@@ -1,46 +1,65 @@
 .root {
-    main-color: rgb(237, 255, 242);       /* Create a looked-up color called "main-color" within root. */
-    -fx-background-color: main-color;
-    -fx-background-image: url("../images/img.png"); /* Set image */
+    bamboo-light: #edf4d4;
+    bamboo-mid: #a8c66c;
+    forest-dark: #234f32;
+    -fx-background-color: linear-gradient(to bottom right, #173b29, forest-dark);
+    -fx-background-image: url("../images/img.png");
     -fx-background-size: 400px 600px;
     -fx-background-repeat: repeat;
+    -fx-font-family: "Segoe UI";
+}
+
+#dialogContainer {
+    -fx-padding: 6px 4px 12px 4px;
 }
 
 .text-field {
-    -fx-background-color: #d9ffe2;
+    -fx-background-color: #fffdf1;
+    -fx-background-radius: 18px 0 0 18px;
+    -fx-border-color: bamboo-mid;
+    -fx-border-radius: 18px 0 0 18px;
+    -fx-border-width: 2px 0 2px 2px;
     -fx-font: 18px "Segoe UI";
+    -fx-prompt-text-fill: #66805a;
+    -fx-text-fill: #183624;
 }
 
 .button {
-    -fx-background-color: mediumspringgreen;
+    -fx-background-color: #5d8b3d;
+    -fx-background-radius: 0 18px 18px 0;
+    -fx-border-color: #3f682a;
+    -fx-border-radius: 0 18px 18px 0;
+    -fx-border-width: 2px;
     -fx-font: bold 16px "Segoe UI";
+    -fx-text-fill: white;
     -fx-cursor: hand;
 }
 
 .button:hover {
-    -fx-background-color: cyan;
+    -fx-background-color: #78a94f;
 }
 
 .button:pressed {
-    -fx-background-color: orange;
+    -fx-background-color: #41692c;
 }
 
 .scroll-pane {
-    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-background-color: transparent;
+    -fx-border-color: #7fa34c;
+    -fx-border-width: 0 2px 0 2px;
 }
 
 .scroll-pane .viewport {
-    -fx-background-color: transparent;
-
+    -fx-background-color: rgba(247, 250, 233, 0.68);
 }
 
 .scroll-bar {
-    -fx-font-size: 10px;  /* Change width of scroll bar. */
-    -fx-background-color: main-color;
+    -fx-font-size: 10px;
+    -fx-background-color: #dce9bd;
 }
 
 .scroll-bar .thumb {
-    -fx-background-color: #ff9cb4;
+    -fx-background-color: #789d50;
     -fx-background-radius: 1em;
 }
 

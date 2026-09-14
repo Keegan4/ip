@@ -1,20 +1,22 @@
 .label {
-    -fx-background-color: #d9f7e5;
-    -fx-border-color: #2a8f62;
-    -fx-border-width: 1px;
+    -fx-background-color: #fff2c9;
+    -fx-border-color: #c59b47;
+    -fx-border-width: 1.5px;
     -fx-background-radius: 1em 1em 0 1em;
     -fx-border-radius: 1em 1em 0 1em;
     -fx-font: 14px "Segoe UI";
     -fx-line-spacing: 2px;
-    -fx-text-fill: #123526;
+    -fx-text-fill: #493718;
+    -fx-effect: dropshadow(gaussian, rgba(31, 63, 38, 0.16), 8, 0.2, 0, 2);
 }
 
 .reply-label {
-    -fx-background-color: #f1fff6;
-    -fx-border-color: #58a57c;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #75a94f;
     -fx-background-radius: 1em 1em 1em 0;
     -fx-border-radius: 1em 1em 1em 0;
-    -fx-font-family: "Consolas";
+    -fx-font-family: "Segoe UI";
+    -fx-text-fill: #183c26;
 }
 
 .add-label {
@@ -30,16 +32,5 @@
 }
 
 #displayPicture {
-    /* Shadow effect on image. */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0.5, 5, 5);
-
-    /* Change size of image. */
-    -fx-scale-x: 1;
-    -fx-scale-y: 1;
-
-    /* Rotate image clockwise by degrees. */
-    -fx-rotate: 0;
-
+    -fx-effect: dropshadow(gaussian, rgba(25, 61, 35, 0.28), 10, 0.3, 2, 3);
 }
-
-
