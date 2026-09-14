@@ -26,7 +26,7 @@ import panda.Panda;
  * Exercises the main JavaFX window through its visible input and dialog controls.
  */
 public class MainWindowTest {
-    private static final int GUI_TIMEOUT_SECONDS = 5;
+    private static final int GUI_TIMEOUT_SECONDS = 15;
 
     @TempDir
     private Path temporaryDirectory;

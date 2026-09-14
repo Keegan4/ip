@@ -35,4 +35,4 @@ jobs:
         run: ${{ matrix.gradle-command }}
 
       - name: Run command-line UI tests
-        run: python .codex/skills/test-ui/scripts/run_ui_tests.py
+        run: python test/run_ui_tests.py
