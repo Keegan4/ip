@@ -2,7 +2,7 @@
 
 ## Configuration
 
-- Setup command: `javac -d build/classes src/main/java/panda/exception/PandaException.java src/main/java/panda/exception/EmptyDescriptionException.java src/main/java/panda/exception/EmptySearchTermException.java src/main/java/panda/exception/InvalidCommandException.java src/main/java/panda/exception/InvalidTaskNumberException.java src/main/java/panda/exception/InvalidUpdateException.java src/main/java/panda/exception/MissingDateTimeException.java src/main/java/panda/exception/InvalidDateException.java src/main/java/panda/exception/DataLoadingException.java src/main/java/panda/exception/DataSavingException.java src/main/java/panda/parser/Command.java src/main/java/panda/task/TaskType.java src/main/java/panda/task/TaskStatus.java src/main/java/panda/task/Task.java src/main/java/panda/task/Todo.java src/main/java/panda/task/Deadline.java src/main/java/panda/task/Event.java src/main/java/panda/ui/Ui.java src/main/java/panda/storage/Storage.java src/main/java/panda/task/TaskList.java src/main/java/panda/parser/Parser.java src/main/java/panda/Panda.java`
+- Setup command: `javac -d build/classes src/main/java/panda/exception/PandaException.java src/main/java/panda/exception/EmptyDescriptionException.java src/main/java/panda/exception/EmptySearchTermException.java src/main/java/panda/exception/InvalidCommandException.java src/main/java/panda/exception/InvalidTaskNumberException.java src/main/java/panda/exception/InvalidUpdateException.java src/main/java/panda/exception/MissingDateTimeException.java src/main/java/panda/exception/InvalidDateException.java src/main/java/panda/exception/InvalidEventPeriodException.java src/main/java/panda/exception/DataLoadingException.java src/main/java/panda/exception/DataSavingException.java src/main/java/panda/parser/Command.java src/main/java/panda/task/TaskType.java src/main/java/panda/task/TaskStatus.java src/main/java/panda/task/Task.java src/main/java/panda/task/Todo.java src/main/java/panda/task/Deadline.java src/main/java/panda/task/Event.java src/main/java/panda/ui/Ui.java src/main/java/panda/storage/Storage.java src/main/java/panda/task/TaskList.java src/main/java/panda/parser/Parser.java src/main/java/panda/Panda.java`
 - Run command: `python test/run_panda_ui.py`
 - Timeout seconds: `10`
 
@@ -466,9 +466,9 @@ Bye. Hope to see you again soon!
 ____________________________________________________________
 ```
 
-## Test Case: Reject invalid deadline and event dates
+## Test Case: Reject invalid deadline and event timings
 
-Aim: Verify that impossible or malformed deadline, event-start, and event-end values report InvalidDateException and do not add tasks.
+Aim: Verify that malformed dates and an Event starting after it ends report focused errors and do not add tasks.
 
 Input:
 
@@ -476,6 +476,7 @@ Input:
 deadline leap-day report /by 2025-02-29 12:00
 event bad start /from tomorrow /to 2026-08-26 16:00
 event bad end /from 2026-08-26 14:00 /to 2025-02-29 16:00
+event backwards /from 2026-08-26 17:00 /to 2026-08-26 16:00
 list
 bye
 ```
@@ -500,6 +501,9 @@ OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
 ____________________________________________________________
 ____________________________________________________________
 OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs an event to start no later than it ends.
 ____________________________________________________________
 ____________________________________________________________
 Here are the tasks in your list:
@@ -1048,6 +1052,7 @@ update 3 /by 2026-09-15 18:00
 update 2 /by 2025-02-29 12:00
 update 3 /from tomorrow /to 2026-09-16 17:00
 update 3 /from 2026-09-16 14:00 /to later
+update 3 /from 2026-09-17 18:00 /to 2026-09-17 17:00
 update 3 /from 2026-09-16 14:00
 list
 bye
@@ -1082,6 +1087,9 @@ OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
 ____________________________________________________________
 ____________________________________________________________
 OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.
+____________________________________________________________
+____________________________________________________________
+OOPS!!! This panda needs an event to start no later than it ends.
 ____________________________________________________________
 ____________________________________________________________
 OOPS!!! This panda needs a valid update. Try /name <new name>, /by <date and time>, or /from <start> /to <end>.

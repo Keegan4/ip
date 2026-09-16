@@ -11,6 +11,7 @@ This file lists all anticipated user-input errors in the current command-line in
 | `event` | Description is missing or blank | `EmptyDescriptionException` | `OOPS!!! This panda needs an event description before it can get to work.` |
 | `event` | `/from` or `/to` information is missing or empty | `MissingDateTimeException` | `OOPS!!! This panda needs more timing details. Try: event <description> /from <start> /to <end>.` |
 | `event` | `/from` or `/to` is malformed or is not a real date and time | `InvalidDateException` | `OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.` |
+| `event` | The `/from` date and time is after the `/to` date and time | `InvalidEventPeriodException` | `OOPS!!! This panda needs an event to start no later than it ends.` |
 | `list` | Optional date is malformed, impossible, or contains extra arguments | `InvalidDateException` | `OOPS!!! This panda needs a valid list date in yyyy-MM-dd format.` |
 | `find` | Search keyword is missing or blank | `EmptySearchTermException` | `OOPS!!! This panda needs a search keyword after find.` |
 | `mark`, `unmark`, `update`, or `delete` | Task number is missing or is not an integer | `InvalidTaskNumberException` | `OOPS!!! This panda needs a valid task number after <command>.` |
@@ -18,9 +19,10 @@ This file lists all anticipated user-input errors in the current command-line in
 | `update` | The update field is missing or malformed, `/name` is blank, an Event timing update omits an endpoint, or a combined update does not put `/name` last | `InvalidUpdateException` | `OOPS!!! This panda needs a valid update. Try /name <new name>, /by <date and time>, or /from <start> /to <end>.` |
 | `update` | `/by` targets a non-Deadline, or `/from` and `/to` target a non-Event | `InvalidUpdateException` | `OOPS!!! This panda cannot apply that timing update to this task type.` |
 | `update` | A supplied timing is malformed or is not a real date and time | `InvalidDateException` | `OOPS!!! This panda needs a valid date and time in yyyy-MM-dd HH:mm format.` |
+| `update` | An Event's new start date and time is after its new end date and time | `InvalidEventPeriodException` | `OOPS!!! This panda needs an event to start no later than it ends.` |
 | `bye` | Any arguments follow `bye` | `InvalidCommandException` | `OOPS!!! I'm bamboo-zled; I don't know what that means :-(` |
 | Any unsupported command | Command name is not recognized | `InvalidCommandException` | `OOPS!!! I'm bamboo-zled; I don't know what that means :-(` |
-| Startup data loading | A stored record has an unknown task type, invalid completion status, missing field, or incorrect number of fields | `DataLoadingException` handled at the individual-record boundary | `Line <number> has <error>`; skip that record and continue loading valid records. |
+| Startup data loading | A stored record has an unknown task type, invalid completion status, missing field, incorrect number of fields, invalid date, or reversed Event period | `DataLoadingException`, `InvalidDateException`, or `InvalidEventPeriodException` handled at the individual-record boundary | Report the applicable error and skip that record while continuing to load valid records. |
 | Startup data loading | The configured data file exists but cannot be opened or read | `DataLoadingException` | `OOPS!!! This panda cannot read its bamboo archive at <path>.` |
 | Startup data loading | The configured relative data file does not exist | No exception; treated as the first run | Start with an empty task list; create the file and any missing parent folders on the first task-list change. |
 | Saving after a task-list change | The data file or its parent directory cannot be created or written | `DataSavingException` | `OOPS!!! This panda could not save its bamboo archive.` The in-memory change remains available for the current session. |

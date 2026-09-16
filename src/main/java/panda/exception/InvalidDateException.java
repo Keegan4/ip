@@ -22,7 +22,7 @@ public class InvalidDateException extends PandaException {
      *
      * @param message the user-facing validation message.
      */
-    private InvalidDateException(String message) {
+    protected InvalidDateException(String message) {
         super(message);
     }
 

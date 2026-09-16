@@ -29,6 +29,12 @@ class PandaExceptionTest {
     }
 
     @Test
+    void invalidEventPeriod_usesOrderingGuidance() {
+        assertEquals("OOPS!!! This panda needs an event to start no later than it ends.",
+                new InvalidEventPeriodException().getMessage());
+    }
+
+    @Test
     void invalidTaskNumber_contexts_distinguishSyntaxAndRange() {
         assertEquals("OOPS!!! This panda needs a valid task number after delete.",
                 new InvalidTaskNumberException("delete").getMessage());

@@ -11,6 +11,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 import panda.exception.InvalidDateException;
+import panda.exception.InvalidEventPeriodException;
 
 /**
  * Tests behavior shared by task types and the date-specific behavior of dated tasks.
@@ -116,6 +117,20 @@ class TaskTest {
                 new Event("meeting", "bad start", "2026-09-14 11:00"));
         assertThrows(InvalidDateException.class, () ->
                 new Event("meeting", "2026-09-14 10:00", "bad end"));
+    }
+
+    @Test
+    void event_startAfterEnd_throwsInvalidEventPeriodException() {
+        assertThrows(InvalidEventPeriodException.class, () ->
+                new Event("meeting", "2026-09-14 11:00", "2026-09-14 10:00"));
+    }
+
+    @Test
+    void event_equalStartAndEnd_createsEvent() throws InvalidDateException {
+        Event event = new Event("instant meeting", "2026-09-14 10:00", "2026-09-14 10:00");
+
+        assertEquals("instant meeting (from: Sep 14 2026 10:00 to: Sep 14 2026 10:00)",
+                event.getDisplayText());
     }
 
     @Test

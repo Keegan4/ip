@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import panda.exception.InvalidDateException;
+import panda.exception.InvalidEventPeriodException;
 
 /**
  * Represents a task with a stated start and end date or time.
@@ -26,8 +27,11 @@ public class Event extends Task {
     public Event(String name, String startDateTimeText, String endDateTimeText)
             throws InvalidDateException {
         super(name);
-        startDateTime = parseDateTime(startDateTimeText);
-        endDateTime = parseDateTime(endDateTimeText);
+        LocalDateTime parsedStartDateTime = parseDateTime(startDateTimeText);
+        LocalDateTime parsedEndDateTime = parseDateTime(endDateTimeText);
+        ensureValidPeriod(parsedStartDateTime, parsedEndDateTime);
+        startDateTime = parsedStartDateTime;
+        endDateTime = parsedEndDateTime;
     }
 
     /**
@@ -53,8 +57,21 @@ public class Event extends Task {
             String updatedEndDateTimeText) throws InvalidDateException {
         LocalDateTime updatedStartDateTime = parseDateTime(updatedStartDateTimeText);
         LocalDateTime updatedEndDateTime = parseDateTime(updatedEndDateTimeText);
+        ensureValidPeriod(updatedStartDateTime, updatedEndDateTime);
         startDateTime = updatedStartDateTime;
         endDateTime = updatedEndDateTime;
+    }
+
+    /**
+     * Ensures an event does not start after it ends.
+     *
+     * @throws InvalidEventPeriodException if the start is after the end.
+     */
+    private void ensureValidPeriod(LocalDateTime proposedStartDateTime,
+            LocalDateTime proposedEndDateTime) throws InvalidEventPeriodException {
+        if (proposedStartDateTime.isAfter(proposedEndDateTime)) {
+            throw new InvalidEventPeriodException();
+        }
     }
 
     /**

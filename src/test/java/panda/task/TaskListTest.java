@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import panda.exception.InvalidDateException;
+import panda.exception.InvalidEventPeriodException;
 import panda.exception.InvalidTaskNumberException;
 import panda.exception.InvalidUpdateException;
 
@@ -166,6 +167,18 @@ class TaskListTest {
 
         assertThrows(InvalidDateException.class, () ->
                 event.reschedule("2026-09-17 14:00", "not a date"));
+        assertEquals("project meeting (from: Sep 16 2026 13:00 to: Sep 16 2026 15:00)",
+                event.getDisplayText());
+    }
+
+    @Test
+    void rescheduleEvent_startAfterEnd_keepsOriginalInterval()
+            throws InvalidDateException {
+        Event event = new Event("project meeting", "2026-09-16 13:00",
+                "2026-09-16 15:00");
+
+        assertThrows(InvalidEventPeriodException.class, () ->
+                event.reschedule("2026-09-17 18:00", "2026-09-17 17:00"));
         assertEquals("project meeting (from: Sep 16 2026 13:00 to: Sep 16 2026 15:00)",
                 event.getDisplayText());
     }

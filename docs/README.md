@@ -134,8 +134,3 @@ the GUI, the rejected command stays in the input box so it can be corrected. See
 | Update a task | `update INDEX /name NEW_DESCRIPTION` or a timing format above |
 | Delete a task | `delete INDEX` |
 | Exit Panda | `bye` |
-
-## Credits
-
-See the project's [AI assistance](../README.md#ai-assistance),
-[image credits](../README.md#credits), and [contributors](../CONTRIBUTORS.md).

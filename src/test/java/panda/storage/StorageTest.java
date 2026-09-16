@@ -22,6 +22,7 @@ import org.junit.jupiter.api.io.TempDir;
 import panda.exception.DataLoadingException;
 import panda.exception.DataSavingException;
 import panda.exception.InvalidDateException;
+import panda.exception.InvalidEventPeriodException;
 import panda.exception.PandaException;
 import panda.task.Deadline;
 import panda.task.Event;
@@ -122,6 +123,7 @@ class StorageTest {
                 "E | 0 | event |   | 2026-09-14 10:00",
                 "E | 0 | event | 2026-09-14 09:00 |   ",
                 "D | 0 | invalid date | 2025-02-29 10:00",
+                "E | 0 | reversed event | 2026-09-14 11:00 | 2026-09-14 10:00",
                 "D | 1 | valid deadline | 2026-09-14 10:00");
         Files.writeString(dataFile, storedData, StandardCharsets.UTF_8);
 
@@ -131,7 +133,7 @@ class StorageTest {
         assertEquals("valid todo", result.tasks().get(0).getName());
         assertEquals("valid deadline", result.tasks().get(1).getName());
         assertTrue(result.tasks().get(1).isDone());
-        assertEquals(10, result.errors().size());
+        assertEquals(11, result.errors().size());
         assertEquals("Line 2 has an invalid task type; expected T, D, or E.",
                 result.errors().get(0).getMessage());
         assertEquals("Line 3 has an invalid completion status; expected 0 or 1.",
@@ -139,6 +141,7 @@ class StorageTest {
         assertEquals("Line 4 has no task description.",
                 result.errors().get(2).getMessage());
         assertInstanceOf(InvalidDateException.class, result.errors().get(9));
+        assertInstanceOf(InvalidEventPeriodException.class, result.errors().get(10));
     }
 
     @Test
