@@ -23,7 +23,7 @@ public class Panda {
      * Builds a relative default path from OS-independent components.
      */
     private static final Path DEFAULT_DATA_FILE_PATH =
-            Path.of("src", "main", "data", "info.txt");
+            Path.of("data", "info.txt");
 
     private final Parser parser;
     private final Storage storage;
