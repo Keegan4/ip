@@ -1,7 +1,6 @@
 package panda.gui;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -14,9 +13,6 @@ import panda.Panda;
  * Starts Panda's JavaFX user interface.
  */
 public class Main extends Application {
-    private static final Path DEFAULT_DATA_FILE_PATH =
-            Path.of("src", "main", "data", "info.txt");
-
     /**
      * Loads and displays Panda's main window.
      *
@@ -25,7 +21,7 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
-        Panda panda = new Panda(DEFAULT_DATA_FILE_PATH.toString());
+        Panda panda = new Panda();
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
         BorderPane root = fxmlLoader.load();
 

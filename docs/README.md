@@ -111,7 +111,7 @@ Format: `bye`
 
 ## Saving and errors
 
-Panda saves changes automatically to `src/main/data/info.txt`, relative to the folder from which it
+Panda saves changes automatically to `data/info.txt`, relative to the folder from which it
 was launched. On the first run, Panda starts with an empty list and creates the file and missing
 folders when the task list first changes.
 

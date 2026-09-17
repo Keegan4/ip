@@ -31,6 +31,11 @@ class PandaTest {
     private InputStream originalInput;
     private PrintStream originalOutput;
 
+    @Test
+    void getDefaultDataFilePath_returnsFileInsideDataDirectory() {
+        assertEquals(Path.of("data", "info.txt"), Panda.getDefaultDataFilePath());
+    }
+
     @BeforeEach
     void redirectStreams() {
         originalInput = System.in;

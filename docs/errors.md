@@ -33,7 +33,7 @@ This file lists all anticipated user-input errors in the current command-line in
 Task fields use ` | ` as the storage delimiter. A pipe or backslash entered by
 the user is prefixed with a backslash in the file and decoded again when loaded.
 The default location is the relative, OS-independent path constructed as
-`Path.of("src", "main", "data", "info.txt")`.
+`Path.of("data", "info.txt")`.
 
 In the GUI, failed commands remain in the input field for correction. A red input hint accompanies
 the original error card; the hint clears after a successful command.

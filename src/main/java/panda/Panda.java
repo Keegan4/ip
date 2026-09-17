@@ -32,6 +32,13 @@ public class Panda {
     private final List<PandaException> loadingErrors;
 
     /**
+     * Creates Panda using the default data file in the {@code data} directory.
+     */
+    public Panda() {
+        this(DEFAULT_DATA_FILE_PATH.toString());
+    }
+
+    /**
      * Creates Panda with a user interface and storage for the supplied file.
      *
      * @param filePath the task data file path.
@@ -55,14 +62,22 @@ public class Panda {
     }
 
     /**
+     * Returns the default data file path.
+     *
+     * @return the default path relative to Panda's working directory.
+     */
+    static Path getDefaultDataFilePath() {
+        return DEFAULT_DATA_FILE_PATH;
+    }
+
+    /**
      * Starts Panda using the default data file or an optional test file.
      *
      * @param args an optional first argument overriding the data file path.
      */
     public static void main(String[] args) {
-        String filePath = args.length > 0
-                ? args[0] : DEFAULT_DATA_FILE_PATH.toString();
-        new Panda(filePath).run();
+        Panda panda = args.length > 0 ? new Panda(args[0]) : new Panda();
+        panda.run();
     }
 
     /**

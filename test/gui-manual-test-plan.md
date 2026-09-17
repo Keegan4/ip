@@ -8,7 +8,7 @@ display resolution, display scaling, and OS language for every run.
 
 Build the distributable JAR with Java 25 by running `gradlew.bat clean shadowJar` on Windows or
 `./gradlew clean shadowJar` on macOS and Linux. Create a disposable working folder, create an empty
-`src/main/data/info.txt` below it, change into that working folder, and launch the JAR using its
+`data/info.txt` below it, change into that working folder, and launch the JAR using its
 absolute path, for example `java -jar C:\path\to\project\build\libs\panda.jar`. Panda resolves its
 data file from the working folder, so this setup protects the normal project data while exercising
 the same GUI and storage behavior. Recreate the disposable folder when a test requires a clean
